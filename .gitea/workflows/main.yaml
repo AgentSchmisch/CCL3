@@ -39,14 +39,26 @@ jobs:
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
           unzip -q commandlinetools.zip -d $SDK_ROOT/cmdline-tools
           mv $SDK_ROOT/cmdline-tools/cmdline-tools $SDK_ROOT/cmdline-tools/tools
-          echo "export ANDROID_HOME=$SDK_ROOT" >> $HOME/.bashrc
-          echo "export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH" >> $HOME/.bashrc
+          echo "ANDROID_HOME=$SDK_ROOT" >> $GITHUB_ENV
+          echo "PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
           export ANDROID_HOME=$SDK_ROOT
           export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH
-          yes | $SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
-          $SDK_ROOT/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
-      # Step 5: Cache Gradle dependencies
+      # Step 5: Accept SDK Licenses
+      - name: Accept SDK Licenses
+        run: |
+          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses || true
+
+      # Step 6: Install SDK Components
+      - name: Install SDK Components
+        run: |
+          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
+      # Step 7: Make gradlew executable
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # Step 8: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -55,17 +67,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 6: Make gradlew executable
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      # Step 7: Build the APK
+      # Step 9: Build the APK
       - name: Build APK
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
         run: ./gradlew assembleDebug
 
-      # Step 8: Upload the APK as an artifact
+      # Step 10: Upload the APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
