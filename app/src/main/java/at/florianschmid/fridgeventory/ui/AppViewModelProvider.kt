@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import at.florianschmid.fridgeventory.TaskApplication
+import at.florianschmid.fridgeventory.ItemApplication
 import at.florianschmid.fridgeventory.ui.add.TaskAddViewModel
 import at.florianschmid.fridgeventory.ui.edit.TaskEditViewModel
 
@@ -12,19 +12,19 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
 
         initializer {
-            TaskViewModel((this[APPLICATION_KEY] as TaskApplication).contactsRepository)
+            TaskViewModel((this[APPLICATION_KEY] as ItemApplication).itemRepository)
         }
 
         initializer {
-            TaskUpdateViewModel(this.createSavedStateHandle(), (this[APPLICATION_KEY] as TaskApplication).contactsRepository)
+            TaskUpdateViewModel(this.createSavedStateHandle(), (this[APPLICATION_KEY] as ItemApplication).itemRepository)
         }
 
         initializer {
-            TaskEditViewModel(this.createSavedStateHandle(), (this[APPLICATION_KEY] as TaskApplication).contactsRepository)
+            TaskEditViewModel(this.createSavedStateHandle(), (this[APPLICATION_KEY] as ItemApplication).itemRepository)
         }
 
         initializer {
-            TaskAddViewModel((this[APPLICATION_KEY] as TaskApplication).contactsRepository)
+            TaskAddViewModel((this[APPLICATION_KEY] as ItemApplication).itemRepository)
         }
     }
 }

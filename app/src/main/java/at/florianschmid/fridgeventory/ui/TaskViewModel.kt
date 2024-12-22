@@ -8,12 +8,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class TaskViewModel(val repository: ItemRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            repository.loadInitialTasks()
+            repository.getAllItems()
         }
     }
 
@@ -25,15 +26,4 @@ class TaskViewModel(val repository: ItemRepository) : ViewModel() {
             initialValue = TasksUiState(emptyList())
         )
 
-    fun onTaskCheckedChanged(item: Item, isChecked: Boolean) {
-        viewModelScope.launch {
-            repository.updateItem(item.copy(status = isChecked))
-        }
-    }
-
-    fun onAddButtonClicked() {
-        viewModelScope.launch {
-            repository.addItem(Item(0,"","","", false))
-        }
-    }
 }

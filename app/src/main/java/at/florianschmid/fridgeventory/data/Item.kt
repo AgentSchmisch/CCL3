@@ -1,9 +1,11 @@
 package at.florianschmid.fridgeventory.data
 
+import java.time.LocalDateTime
+
 data class Item(
     val id: Int,
     val name: String,
-    val desc: String,
-    val dueDate: String,
-    val status: Boolean
-)
+    val expiry_date: LocalDateTime,
+    var quantity: Int,
+    val additional: String,
+    )

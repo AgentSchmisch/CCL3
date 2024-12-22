@@ -1,20 +1,26 @@
 package at.florianschmid.fridgeventory.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -23,8 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -36,13 +47,15 @@ import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.add.TaskAddScreen
 import at.florianschmid.fridgeventory.ui.edit.TaskEditScreen
 import at.florianschmid.fridgeventory.ui.theme.Black
-import at.florianschmid.fridgeventory.ui.theme.Purple80
 import at.florianschmid.fridgeventory.ui.theme.Typography
+import at.florianschmid.fridgeventory.R
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-enum class ContactRoutes(val route: String) {
+enum class ItemRoutes(val route: String) {
     Home("task/home"),
-    Detail("task/details/{contactId}"),
-    Edit("task/details/{contactId}/edit"),
+    Detail("task/details/{itemId}"),
+    Edit("task/details/{itemId}/edit"),
     Add("task/new")
 }
 
@@ -52,25 +65,28 @@ fun TodoApp(modifier: Modifier = Modifier) {
 
     NavHost(
         navController = navController,
-        startDestination = ContactRoutes.Home.route,
+        startDestination = ItemRoutes.Home.route,
         modifier = modifier
     ) {
-        composable(ContactRoutes.Home.route) {
+        composable(ItemRoutes.Home.route) {
             ContactsHomeScreen(
                 onEditClick = {
-                    navController.navigate(ContactRoutes.Edit.route.replace("{contactId}", "$it"))
+                    navController.navigate(ItemRoutes.Edit.route.replace("{itemId}", "$it"))
                 },
                 onAddClick = {
-                    navController.navigate(ContactRoutes.Add.route) // Navigate to Add route
+                    navController.navigate(ItemRoutes.Add.route) // Navigate to Add route
                 },
                 onCardClick = {
-                    navController.navigate(ContactRoutes.Detail.route.replace("{contactId}", "$it"))
+                    navController.navigate(ItemRoutes.Detail.route.replace("{itemId}", "$it"))
+                },
+                onCountChange = { item, change ->
+                    changeQuantity(item, change)
                 }
             )
         }
         composable(
-            route = ContactRoutes.Detail.route,
-            arguments = listOf(navArgument("contactId") {
+            route = ItemRoutes.Detail.route,
+            arguments = listOf(navArgument("itemId") {
                 type = NavType.IntType
             })
         ) {
@@ -78,7 +94,7 @@ fun TodoApp(modifier: Modifier = Modifier) {
         }
 
         composable(
-            route = ContactRoutes.Add.route
+            route = ItemRoutes.Add.route
         ) {
             TaskAddScreen(){
                 navController.navigateUp()
@@ -86,8 +102,8 @@ fun TodoApp(modifier: Modifier = Modifier) {
         }
 
         composable(
-            route = ContactRoutes.Edit.route,
-            arguments = listOf(navArgument("contactId") {
+            route = ItemRoutes.Edit.route,
+            arguments = listOf(navArgument("itemId") {
                 type = NavType.IntType
             })
         ) {
@@ -104,36 +120,39 @@ fun ContactsHomeScreen(
     taskViewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onEditClick: (Int) -> Unit,
     onAddClick: () -> Unit,
-    onCardClick: (Int) -> Unit
+    onCardClick: (Int) -> Unit,
+    onCountChange: (Item, Int) -> Unit
 ) {
     val state by taskViewModel.tasksUiState.collectAsStateWithLifecycle()
 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         // We use lazy column for dynamic lists or large lists
         // it will only draw the visible contacts
-        Text("Tasks", style = Typography.titleLarge)
+        Text("Items", style = Typography.titleLarge)
 
         Spacer(Modifier.height(16.dp))
 
+        //TODO: make the button floating over the items
         Row(Modifier.align(Alignment.End)) {
             IconButton(onAddClick) {
                 Icon(Icons.Default.Add, "Add task", tint = Black)
             }
         }
-        Spacer(Modifier.height(16.dp))
-        LazyColumn {
-            itemsIndexed(state.items) { index, task ->
-                TaskListItem(task,
-                onCardClick = {
-                    onCardClick(task.id)
-                },
-                onEditClick = {
-                    onEditClick(task.id)
-                },
-                onCheckedChange = { isChecked ->
-                        taskViewModel.onTaskCheckedChanged(task, isChecked)
-                    },
 
+        Spacer(Modifier.height(16.dp))
+
+        LazyColumn {
+            itemsIndexed(state.items) { index, item ->
+                TaskListItem(item,
+                    onCardClick = {
+                        onCardClick(item.id)
+                    },
+                    onEditClick = {
+                        onEditClick(item.id)
+                    },
+                    onCountChange = {
+                        item, change -> onCountChange(item, change)
+                    }
                 )
             }
         }
@@ -141,38 +160,113 @@ fun ContactsHomeScreen(
 }
 
 @Composable
-fun TaskListItem(item: Item, onCardClick: () -> Unit,
-                 onEditClick: ()->Unit,
-                 onCheckedChange: (Boolean) -> Unit,
-                 modifier: Modifier = Modifier) {
-    OutlinedCard(
-        onClick = { onCardClick() }, modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-            colors = CardDefaults.outlinedCardColors(containerColor = Purple80,)    ) {
-        Row(
-            Modifier
-                .padding(16.dp)
-                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
+fun TaskListItem(
+    item: Item,
+    onCardClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onCountChange: (item: Item, change: Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = { onCardClick() },
+        modifier = modifier
+            .fillMaxWidth() // Card takes full width
+            .height(240.dp) // Adjust height as needed
+            .padding(8.dp), // Add padding around the card
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent), // Make container transparent
+        shape = RoundedCornerShape(16.dp) // Optional: Rounded corners
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize() // Box stretches to fill the card
         ) {
-            Text(item.name, style = Typography.headlineMedium, color = Black)
-            Row(){
-                Checkbox(
-                    checked = item.status,
-                    onCheckedChange = onCheckedChange
+            // Background Image that completely fills the card
+            Image(
+                painter = painterResource(id = R.mipmap.apple_foreground),
+                contentDescription = "Apple",
+                modifier = Modifier
+                    .fillMaxSize() // Fill the Box entirely, no gaps
+                    .align(Alignment.Center), // Center image
+                contentScale = ContentScale.Crop // Crop image to fill card without distortion
+            )
+
+            // Overlay content (Text and Controls)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart) // Align overlay to the bottom
+                    .background(colorResource(R.color.f_purple))// Semi-transparent black background
+                    .padding(16.dp) // Inner padding for overlay content
+            ) {
+                // Title (Item Name)
+                Text(
+                    text = item.name,
+                    style = Typography.headlineMedium,
+                    color = Color.White
                 )
-                IconButton(onEditClick) {
-                    Icon(Icons.Outlined.Edit, "Edit task", tint = Black)
+
+                // Date and Timer Icon Row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_timer_24),
+                        contentDescription = "Expiry Date",
+                        tint = Color.White
+                    )
+                    Text(
+                        text = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(item.expiry_date),
+                        style = Typography.bodyLarge,
+                        color = Color.White
+                    )
+                }
+            }
+
+            // Controls (Quantity Increase/Decrease Buttons)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd) // Align to bottom-right
+                    .padding(16.dp)
+            ) {
+                IconButton(onClick = { onCountChange(item, -1) }) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Decrease",
+                        tint = Color.White
+                    )
+                }
+
+                Text(
+                    text = item.quantity.toString(), // Replace with dynamic value
+                    color = Color.White,
+                    style = androidx.compose.ui.text.TextStyle(fontSize = 18.sp)
+                )
+
+                IconButton(onClick = { onCountChange(item, 1) }) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Increase",
+                        tint = Color.White
+                    )
                 }
             }
         }
     }
 }
+@Composable
+fun changeQuantity(item: Item, change: Int, taskUpdateViewModel: TaskUpdateViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+    val detailUiState by taskUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
+
+    item.quantity += change
+}
+
 
 @Composable
 fun TaskDetailsScreen(modifier: Modifier = Modifier, taskUpdateViewModel: TaskUpdateViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val detailUiState by taskUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
-
     TaskDetails(detailUiState.item, modifier)
 }
 
@@ -187,22 +281,28 @@ fun TaskDetails(item: Item, modifier: Modifier = Modifier) {
         Column(Modifier.padding(16.dp)) {
             Text(item.name, style = Typography.headlineMedium)
             Column {
-                Text("Description: ${item.desc}", style = Typography.headlineSmall)
+                Text("Description: ${item.additional}", style = Typography.headlineSmall)
                 Spacer(Modifier.width(20.dp))
-                Text("Due Date: ${item.dueDate}", style = Typography.headlineSmall)
+                Text("Expiry Date: ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(item.expiry_date)}", style = Typography.headlineSmall)
             }
         }
     }
 }
 
+
+
+
 @Preview
 @Composable
 private fun TaskDetailsPreview() {
-    TaskDetails(Item(0, "Task1", "this is a short description", "20.11.2024",false))
+    TaskDetails(Item(0, "Apples", LocalDateTime.of(2024, 12, 24,0,0), 5,""))
 }
+
 
 @Preview
 @Composable
 private fun TaskListItemPreview() {
-    TaskListItem(Item(0, "Task1", "this is a short task description", "20.11.2024",false), {}, {}, {})
+    TaskListItem(Item(0, "Apples", LocalDateTime.of(2024, 12, 24,0,0), 5,""), {}, {}, {_,_ ->})
 }
+
+

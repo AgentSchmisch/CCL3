@@ -11,9 +11,10 @@ import at.florianschmid.fridgeventory.data.ItemRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 
 data class ContactEditUi(
-    val item: Item = Item(0, "", "", "",false)
+    val item: Item = Item(0, "", LocalDateTime.of(2024,12,9,0,0), 5,"")
 )
 
 class TaskEditViewModel(private val savedStateHandle: SavedStateHandle,

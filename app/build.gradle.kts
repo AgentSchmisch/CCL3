@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "at.florianschmid.todoapp"
+    namespace = "at.florianschmid.fridgeventory"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "at.florianschmid.todoapp"
+        applicationId = "at.florianschmid.fridgeventory"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

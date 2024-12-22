@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.AppViewModelProvider
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TaskEditScreen(
@@ -55,18 +57,18 @@ fun TaskEditForm(
             }
             Row {
                 OutlinedTextField(
-                    value = item.desc,
+                    value = item.additional,
                     label = { Text("Description") },
                     onValueChange = { newText ->
-                        onValueChange(item.copy(desc = newText))
+                        onValueChange(item.copy(additional = newText))
                     })
             }
             Row {
                 OutlinedTextField(
-                    value = item.dueDate,
+                    value = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(item.expiry_date),
                     label = { Text("Due Date") },
                     onValueChange = { newText ->
-                        onValueChange(item.copy(dueDate = newText))
+                        onValueChange(item.copy(expiry_date = LocalDateTime.parse(newText, DateTimeFormatter.ofPattern("dd.MM.yyyy"))))
                     })
             }
 
@@ -80,5 +82,5 @@ fun TaskEditForm(
 @Preview
 @Composable
 private fun ContactEditPreview() {
-    TaskEditForm(Item(234, "", "asdfasf", "",false)) { }
+    TaskEditForm(Item(0, "", LocalDateTime.of(2024,12,9,0,0), 5,"")) { }
 }

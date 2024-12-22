@@ -19,11 +19,11 @@ interface ItemDao {
     @Delete
     suspend fun deleteItem(itemEntity: ItemEntity)
 
-    @Query("SELECT * FROM tasks WHERE _id = :id")
+    @Query("SELECT * FROM items WHERE _id = :id")
     suspend fun findItemById(id: Int): ItemEntity
 
-    @Query("SELECT * from tasks WHERE status = :status")
-    fun getAllItems(status:Boolean): Flow<List<ItemEntity>>
+    @Query("SELECT * from items ORDER BY expiry_date ASC")
+    fun getAllItems(): Flow<List<ItemEntity>>
 
     @Query("SELECT * FROM items WHERE expiry_date BETWEEN date('now') AND date('now', '+2 days')")
     fun getItemsExpiringSoon(): Flow<List<ItemEntity>>

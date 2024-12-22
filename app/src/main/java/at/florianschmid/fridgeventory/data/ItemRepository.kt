@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.map
 class ItemRepository(private val itemDao: ItemDao) {
 
     fun getAllItems(): Flow<List<Item>> {
-        return itemDao.getAllItems(false).map {
+        return itemDao.getAllItems().map {
             it.map {item ->
                 Item(
                     item._id,
                     item.name,
-                    item.desc,
-                    item.dueDate,
-                    item.status
+                    item.expiry_date,
+                    item.quantity,
+                    item.additional
                 )
             }
         }
@@ -26,18 +26,17 @@ class ItemRepository(private val itemDao: ItemDao) {
         return Item(
             item._id,
             item.name,
-            item.desc,
-            item.dueDate,
-            item.status
+            item.expiry_date,
+            item.quantity,
+            item.additional
         )
     }
 
 
     suspend fun addItem(item:Item) {
-        itemDao.addItem(ItemEntity(_id=0, item.name, item.desc, item.dueDate, item.status))
+        itemDao.addItem(ItemEntity(_id=0, item.name, item.expiry_date, item.quantity, item.additional))
     }
 
     suspend fun updateItem(item: Item) {
-        itemDao.updateItem(ItemEntity(item.id, item.name, item.desc, item.dueDate, item.status))
+        itemDao.updateItem(ItemEntity(item.id, item.name, item.expiry_date, item.quantity, item.additional))    }
     }
-}

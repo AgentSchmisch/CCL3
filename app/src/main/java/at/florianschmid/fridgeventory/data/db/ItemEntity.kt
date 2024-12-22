@@ -2,14 +2,14 @@ package at.florianschmid.fridgeventory.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDate
+import java.time.LocalDateTime
 
-@Entity(tableName = "tasks")
+@Entity(tableName = "items")
 data class ItemEntity(
     @PrimaryKey(autoGenerate = true)
     val _id: Int = 0,
     val name: String,
-    val expiry_date:  LocalDate,
-    val quantity: Int,
+    val expiry_date:  LocalDateTime,
+    var quantity: Int,
     val additional: String,
 )

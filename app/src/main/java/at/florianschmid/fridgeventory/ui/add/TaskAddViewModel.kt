@@ -8,9 +8,10 @@ import androidx.lifecycle.viewModelScope
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.data.ItemRepository
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 data class TaskAddUi(
-    val item: Item = Item(0, "", "", "",false)
+    val item: Item = Item(0, "", LocalDateTime.now(), 5,"")
 )
 
 class TaskAddViewModel(private val itemRepository: ItemRepository) : ViewModel() {
@@ -20,13 +21,13 @@ class TaskAddViewModel(private val itemRepository: ItemRepository) : ViewModel()
 
     init {
         viewModelScope.launch {
-            val item = Item(0, "", "","",false)
+            val item = Item(0, "", LocalDateTime.now(), 5,"")
             addUiState = TaskAddUi(item)
         }
     }
 
     fun updateTask(item: Item) {
-        addUiState = addUiState.copy(item=item)
+        addUiState = addUiState.copy(item = item)
     }
 
     fun saveTask() {
