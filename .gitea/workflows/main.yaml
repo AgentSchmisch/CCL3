@@ -25,27 +25,28 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      # Step 3: Install Android SDK
-      - name: Install Android SDK
+      # Step 3: Install Required Tools
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip
+
+      # Step 4: Install Android SDK
+      - name: Install Android SDK
+        run: |
+          SDK_ROOT=$HOME/android-sdk
+          mkdir -p $SDK_ROOT/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          unzip -q commandlinetools.zip -d $HOME/android-sdk/cmdline-tools
-          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/tools
-          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses
-          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+          unzip -q commandlinetools.zip -d $SDK_ROOT/cmdline-tools
+          mv $SDK_ROOT/cmdline-tools/cmdline-tools $SDK_ROOT/cmdline-tools/tools
+          echo "export ANDROID_HOME=$SDK_ROOT" >> $HOME/.bashrc
+          echo "export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH" >> $HOME/.bashrc
+          export ANDROID_HOME=$SDK_ROOT
+          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH
+          yes | $SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
+          $SDK_ROOT/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
-      # Step 4: Set ANDROID_HOME environment variable
-      - name: Set ANDROID_HOME
-        run: echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-
-      # Step 5: Make gradlew executable
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      # Step 6: Cache Gradle dependencies
+      # Step 5: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -53,6 +54,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      # Step 6: Make gradlew executable
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       # Step 7: Build the APK
       - name: Build APK
