@@ -25,11 +25,27 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      # Step 3: Make gradlew executable
+      # Step 3: Install Android SDK
+      - name: Install Android SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip -q commandlinetools.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/tools
+          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses
+          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
+      # Step 4: Set ANDROID_HOME environment variable
+      - name: Set ANDROID_HOME
+        run: echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+
+      # Step 5: Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Step 4: Cache Gradle dependencies
+      # Step 6: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -38,11 +54,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 5: Build the APK
+      # Step 7: Build the APK
       - name: Build APK
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
         run: ./gradlew assembleDebug
 
-      # Step 6: Upload the APK as an artifact
+      # Step 8: Upload the APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
