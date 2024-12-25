@@ -22,10 +22,10 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE _id = :id")
     suspend fun findItemById(id: Int): ItemEntity
 
-    @Query("SELECT * from items ORDER BY expiry_date ASC")
+    @Query("SELECT * from items WHERE quantity > 0 ORDER BY expiry_date ASC ")
     fun getAllItems(): Flow<List<ItemEntity>>
 
-    @Query("SELECT * FROM items WHERE expiry_date BETWEEN date('now') AND date('now', '+2 days')")
+    @Query("SELECT * FROM items WHERE expiry_date BETWEEN date('now') AND date('now', '+2 days') AND quantity > 0 ORDER BY expiry_date ASC")
     fun getItemsExpiringSoon(): Flow<List<ItemEntity>>
 
 }

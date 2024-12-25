@@ -78,9 +78,6 @@ fun TodoApp(modifier: Modifier = Modifier) {
                 },
                 onCardClick = {
                     navController.navigate(ItemRoutes.Detail.route.replace("{itemId}", "$it"))
-                },
-                onCountChange = { item, change ->
-                    changeQuantity(item, change)
                 }
             )
         }
@@ -121,7 +118,6 @@ fun ContactsHomeScreen(
     onEditClick: (Int) -> Unit,
     onAddClick: () -> Unit,
     onCardClick: (Int) -> Unit,
-    onCountChange: (Item, Int) -> Unit
 ) {
     val state by taskViewModel.tasksUiState.collectAsStateWithLifecycle()
 
@@ -150,9 +146,7 @@ fun ContactsHomeScreen(
                     onEditClick = {
                         onEditClick(item.id)
                     },
-                    onCountChange = {
-                        item, change -> onCountChange(item, change)
-                    }
+                    viewModel = taskViewModel
                 )
             }
         }
@@ -164,8 +158,8 @@ fun TaskListItem(
     item: Item,
     onCardClick: () -> Unit,
     onEditClick: () -> Unit,
-    onCountChange: (item: Item, change: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TaskViewModel
 ) {
     Card(
         onClick = { onCardClick() },
@@ -231,7 +225,7 @@ fun TaskListItem(
                     .align(Alignment.BottomEnd) // Align to bottom-right
                     .padding(16.dp)
             ) {
-                IconButton(onClick = { onCountChange(item, -1) }) {
+                IconButton(onClick = { changeQuantity(item = item, change = -1, viewModel=viewModel) }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowDown,
                         contentDescription = "Decrease",
@@ -245,7 +239,7 @@ fun TaskListItem(
                     style = androidx.compose.ui.text.TextStyle(fontSize = 18.sp)
                 )
 
-                IconButton(onClick = { onCountChange(item, 1) }) {
+                IconButton(onClick = { changeQuantity(item, 1, viewModel=viewModel) }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
                         contentDescription = "Increase",
@@ -256,11 +250,19 @@ fun TaskListItem(
         }
     }
 }
-@Composable
-fun changeQuantity(item: Item, change: Int, taskUpdateViewModel: TaskUpdateViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
-    val detailUiState by taskUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
 
-    item.quantity += change
+
+fun changeQuantity(
+    item: Item,
+    change: Int,
+    viewModel: TaskViewModel
+) {
+    // Call ViewModel to handle quantity change
+    if (change > 0) {
+        viewModel.incrementCount(item)
+    } else {
+        viewModel.decrementCount(item)
+    }
 }
 
 
@@ -299,10 +301,6 @@ private fun TaskDetailsPreview() {
 }
 
 
-@Preview
-@Composable
-private fun TaskListItemPreview() {
-    TaskListItem(Item(0, "Apples", LocalDateTime.of(2024, 12, 24,0,0), 5,""), {}, {}, {_,_ ->})
-}
+
 
 

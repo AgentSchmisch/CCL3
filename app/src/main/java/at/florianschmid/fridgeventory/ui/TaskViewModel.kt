@@ -18,6 +18,20 @@ class TaskViewModel(val repository: ItemRepository) : ViewModel() {
         }
     }
 
+    fun incrementCount(item: Item) {
+        viewModelScope.launch {
+            repository.updateItem(item.copy(quantity = item.quantity + 1))
+        }
+    }
+
+    fun decrementCount(item: Item) {
+        viewModelScope.launch {
+            if (item.quantity > 0) { // Prevent negative quantities
+                repository.updateItem(item.copy(quantity = item.quantity - 1))
+            }
+        }
+    }
+
     val tasksUiState = repository.getAllItems()
         .map { TasksUiState(it) }
         .stateIn(
@@ -25,5 +39,4 @@ class TaskViewModel(val repository: ItemRepository) : ViewModel() {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = TasksUiState(emptyList())
         )
-
 }
