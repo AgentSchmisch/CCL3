@@ -1,4 +1,4 @@
-name: Build and Upload APK to Gitea
+name: Build Android APK
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build APK and Upload to Gitea
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
@@ -25,11 +25,11 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      # Step 3: Install Dependencies
+      # Step 3: Install Required Tools
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
+          sudo apt-get install -y wget unzip          
 
       # Step 4: Install Android SDK
       - name: Install Android SDK
@@ -42,19 +42,43 @@ jobs:
           echo "ANDROID_HOME=$SDK_ROOT" >> $GITHUB_ENV
           echo "PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
           export ANDROID_HOME=$SDK_ROOT
-          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH
-          yes | $SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
-          $SDK_ROOT/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH          
 
-      # Step 5: Make gradlew executable
+      # Step 5: Accept SDK Licenses
+      - name: Accept SDK Licenses
+        run: |
+          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses || true          
+
+      # Step 6: Install SDK Components
+      - name: Install SDK Components
+        run: |
+          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"          
+
+      # Step 7: Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Step 6: Build the APK
+      # Step 8: Cache Gradle dependencies
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-            
+
+      # Step 9: Build the APK
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # Step 7: Upload APK to Gitea
+      # Step 10: Upload the APK as an artifact
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      # Step 11: Upload the APK to Gitea
       - name: Upload APK to Gitea
         env:
           REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
