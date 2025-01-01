@@ -1,4 +1,4 @@
-package at.florianschmid.fridgeventory.ui.theme
+package at.florianschmid.fridgeventory.ExpiringItems.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun TodoAppTheme(
+fun FridgeventoryTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

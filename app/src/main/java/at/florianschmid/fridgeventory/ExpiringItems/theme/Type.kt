@@ -1,4 +1,4 @@
-package at.florianschmid.fridgeventory.ui.theme
+package at.florianschmid.fridgeventory.ExpiringItems.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
