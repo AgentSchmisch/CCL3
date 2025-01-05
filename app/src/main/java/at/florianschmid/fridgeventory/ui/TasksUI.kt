@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -38,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,10 +49,8 @@ import androidx.navigation.navArgument
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.add.TaskAddScreen
 import at.florianschmid.fridgeventory.ui.edit.TaskEditScreen
-import at.florianschmid.fridgeventory.ui.theme.Black
-import at.florianschmid.fridgeventory.ui.theme.Typography
+import at.florianschmid.fridgeventory.ExpiringItems.theme.Typography
 import at.florianschmid.fridgeventory.R
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 enum class ItemRoutes(val route: String) {
@@ -82,11 +78,11 @@ fun TodoApp(modifier: Modifier = Modifier) {
                     navController.navigate(ItemRoutes.Add.route) // Navigate to Add route
                 },
                 onCardClick = {
-                    navController.navigate(ItemRoutes.Detail.route.replace("{itemId}", "$it"))
+                    navController.navigate(ItemRoutes.Edit.route.replace("{itemId}", "$it"))
                 }
             )
         }
-        composable(
+        composable (
             route = ItemRoutes.Detail.route,
             arguments = listOf(navArgument("itemId") {
                 type = NavType.IntType
@@ -98,7 +94,7 @@ fun TodoApp(modifier: Modifier = Modifier) {
         composable(
             route = ItemRoutes.Add.route
         ) {
-            TaskAddScreen(){
+            TaskAddScreen {
                 navController.navigateUp()
             }
         }
@@ -109,7 +105,7 @@ fun TodoApp(modifier: Modifier = Modifier) {
                 type = NavType.IntType
             })
         ) {
-            TaskEditScreen() {
+            TaskEditScreen {
                 navController.navigateUp()
             }
         }
@@ -134,7 +130,7 @@ fun ContactsHomeScreen(
         Spacer(Modifier.height(16.dp))
 
         LazyColumn {
-            itemsIndexed(state.items) { index, item ->
+            itemsIndexed(state.items) { _, item ->
                 TaskListItem(item,
                     onCardClick = {
                         onCardClick(item.id)
@@ -194,7 +190,7 @@ fun TaskListItem(
     viewModel: TaskViewModel
 ) {
     Card(
-        onClick = { onCardClick() },
+        onClick = { onEditClick() },
         modifier = modifier
             .fillMaxWidth() // Card takes full width
             .height(240.dp) // Adjust height as needed
@@ -322,17 +318,3 @@ fun TaskDetails(item: Item, modifier: Modifier = Modifier) {
         }
     }
 }
-
-
-
-
-@Preview
-@Composable
-private fun TaskDetailsPreview() {
-    TaskDetails(Item(0, "Apples", LocalDateTime.of(2024, 12, 24,0,0), 5,""))
-}
-
-
-
-
-

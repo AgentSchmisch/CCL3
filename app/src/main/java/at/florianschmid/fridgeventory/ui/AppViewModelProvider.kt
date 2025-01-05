@@ -12,7 +12,7 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
 
         initializer {
-            TaskViewModel((this[APPLICATION_KEY] as ItemApplication).itemRepository)
+            TaskViewModel((this[APPLICATION_KEY] as ItemApplication).itemRepository, (this[APPLICATION_KEY] as ItemApplication).applicationContext)
         }
 
         initializer {

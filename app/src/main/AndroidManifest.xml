@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".ItemApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,8 +15,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Fridgeventory"
-        android:name=".ItemApplication"
         tools:targetApi="31">
+        <activity
+            android:name=".ExpiringItemsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_expiring_items"
+            android:theme="@style/Theme.Fridgeventory" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

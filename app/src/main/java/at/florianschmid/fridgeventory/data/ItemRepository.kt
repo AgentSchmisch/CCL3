@@ -38,5 +38,20 @@ class ItemRepository(private val itemDao: ItemDao) {
     }
 
     suspend fun updateItem(item: Item) {
-        itemDao.updateItem(ItemEntity(item.id, item.name, item.expiry_date, item.quantity, item.additional))    }
+        itemDao.updateItem(ItemEntity(item.id, item.name, item.expiry_date, item.quantity, item.additional))
     }
+
+    fun findItemsExpiringSoon(): Flow<List<Item>> {
+        return itemDao.getItemsExpiringSoon().map {
+            it.map {item ->
+                Item(
+                    item._id,
+                    item.name,
+                    item.expiry_date,
+                    item.quantity,
+                    item.additional
+                )
+            }
+        }
+    }
+}

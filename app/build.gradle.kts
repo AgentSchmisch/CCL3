@@ -53,18 +53,18 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.navigation.compose)
+    implementation (libs.androidx.navigation.compose)
+
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
 
-    // Retrofit
-    val retrofit_version = "2.11.0"
-    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:$retrofit_version")
-    implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    // okHttp for api calls
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -20,25 +20,25 @@ data class ContactEditUi(
 class TaskEditViewModel(private val savedStateHandle: SavedStateHandle,
                         private val itemRepository: ItemRepository) : ViewModel() {
 
-    private val contactId: Int = checkNotNull(savedStateHandle["contactId"])
+    private val itemId: Int = checkNotNull(savedStateHandle["itemId"])
 
     var editUiState by mutableStateOf(ContactEditUi())
         private set
 
     init {
         viewModelScope.launch {
-            val contact = withContext(Dispatchers.IO) {
-                itemRepository.findItemById(contactId)
+            val item = withContext(Dispatchers.IO) {
+                itemRepository.findItemById(itemId)
             }
-            editUiState = ContactEditUi(contact)
+            editUiState = ContactEditUi(item)
         }
     }
 
-    fun updateContact(item: Item) {
+    fun updateItem(item: Item) {
         editUiState = editUiState.copy(item=item)
     }
 
-    fun saveContact() {
+    fun saveItem() {
         viewModelScope.launch {
             itemRepository.updateItem(editUiState.item)
         }
