@@ -7,6 +7,5 @@ data class Item(
     val name: String,
     val expiry_date: LocalDateTime,
     var quantity: Int,
-    val additional: String,
-    var checked: Boolean = false
+    val additional: String
 )

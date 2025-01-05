@@ -33,31 +33,24 @@ fun ExpiringItemsUI(modifier: Modifier = Modifier,
 
     val state by itemsViewModel.expiringItemsUiState.collectAsStateWithLifecycle()
 
-    var items = mutableListOf<Item>()
-
-
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text("Expiring Items", style = Typography.titleLarge)
         Spacer(Modifier.height(16.dp))
         LazyColumn {
             itemsIndexed(state.items) { _, item ->
-                ItemCard (items, item)
+                ItemCard (item)
             }
-        }
-        Button(onClick = { /*TODO*/ }) {
-            Text("Get Recipe")
         }
     }
 }
 
 @Composable
-fun ItemCard(items: MutableList<Item>, item: Item) {
+fun ItemCard(item: Item) {
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.border (1.dp, color = Color.White)
                            .padding(8.dp)
                             .fillMaxWidth()) {
 
-        Checkbox(checked = item.checked, onCheckedChange = { onCheckedChanged(items, item) })
         Column {
             Text("Item Name: ${item.name}")
             Text("Expiry Date: ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(item.expiry_date)}")
@@ -65,18 +58,15 @@ fun ItemCard(items: MutableList<Item>, item: Item) {
     }
 }
 
-fun onCheckedChanged(items: MutableList<Item>, item: Item){
-    item.checked = !item.checked
-    items.add(item)
-}
+
 
 @Composable
 @Preview
 fun ExpiringItemsUIPreview() {
 
     val mockItems = mutableListOf(
-        Item(0, "Apples", LocalDateTime.of(2024, 12, 24, 0, 0), 5, "", false),
+        Item(0, "Apples", LocalDateTime.of(2024, 12, 24, 0, 0), 5, ""),
     )
 
-    ItemCard(mockItems, mockItems[0])
+    ItemCard(mockItems[0])
 }
