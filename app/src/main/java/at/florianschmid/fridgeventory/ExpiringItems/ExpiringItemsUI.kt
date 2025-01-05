@@ -58,8 +58,6 @@ fun ItemCard(item: Item) {
     }
 }
 
-
-
 @Composable
 @Preview
 fun ExpiringItemsUIPreview() {

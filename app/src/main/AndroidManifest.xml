@@ -17,7 +17,7 @@
         android:theme="@style/Theme.Fridgeventory"
         tools:targetApi="31">
         <activity
-            android:name="at.florianschmid.fridgeventory.ExpiringItemsActivity"
+            android:name=".ExpiringItemsActivity"
             android:exported="false"
             android:label="@string/title_activity_expiring_items"
             android:theme="@style/Theme.Fridgeventory" />
