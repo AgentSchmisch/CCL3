@@ -94,7 +94,7 @@ fun TodoApp(modifier: Modifier = Modifier) {
         composable(
             route = ItemRoutes.Add.route
         ) {
-            TaskAddScreen() {
+            TaskAddScreen {
                 navController.navigateUp()
             }
         }
@@ -105,7 +105,7 @@ fun TodoApp(modifier: Modifier = Modifier) {
                 type = NavType.IntType
             })
         ) {
-            TaskEditScreen() {
+            TaskEditScreen {
                 navController.navigateUp()
             }
         }

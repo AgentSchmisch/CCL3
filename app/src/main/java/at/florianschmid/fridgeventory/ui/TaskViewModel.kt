@@ -46,7 +46,7 @@ class TaskViewModel(val repository: ItemRepository, val context: Context) : View
             30, // Interval duration
             TimeUnit.MINUTES // Interval time unit
         )
-            .build()
+        .build()
 
         // Enqueue the worker
         WorkManager.getInstance(context).enqueue(workRequest)

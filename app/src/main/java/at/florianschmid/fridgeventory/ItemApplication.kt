@@ -11,4 +11,5 @@ class ItemApplication : Application() {
             ItemDatabase.getDatabase(this).itemDao()
         )
     }
+
 }

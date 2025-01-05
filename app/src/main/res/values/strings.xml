@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Fridgeventory</string>
+    <string name="title_activity_expiring_items">ExpiringItems</string>
 </resources>
