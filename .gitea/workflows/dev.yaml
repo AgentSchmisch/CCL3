@@ -7,7 +7,6 @@ on:
   pull_request:
     branches-ignore:
       - master
-name: Build Android APK
 
 jobs:
   build:
