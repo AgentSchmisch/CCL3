@@ -7,6 +7,7 @@ on:
   pull_request:
     branches-ignore:
       - master
+name: Build Android APK
 
 jobs:
   build:
@@ -25,11 +26,11 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      # Step 3: Install dependencies
+      # Step 3: Install Required Tools
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
+          sudo apt-get install -y wget unzip                    
 
       # Step 4: Install Android SDK
       - name: Install Android SDK
@@ -42,18 +43,34 @@ jobs:
           echo "ANDROID_HOME=$SDK_ROOT" >> $GITHUB_ENV
           echo "PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
           export ANDROID_HOME=$SDK_ROOT
-          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH
+          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH                    
 
-      # Step 5: Accept SDK Licenses and Install SDK Components
-      - name: Set up Android SDK
+      # Step 5: Accept SDK Licenses
+      - name: Accept SDK Licenses
         run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses || true                    
 
-      # Step 6: Make gradlew executable
+      # Step 6: Install SDK Components
+      - name: Install SDK Components
+        run: |
+          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"                    
+
+      # Step 7: Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Step 7: Build the APK
+      # Step 8: Cache Gradle dependencies
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-                        
+
+      # Step 9: Build the APK
       - name: Build APK
         run: ./gradlew assembleDebug
+
+    
+
