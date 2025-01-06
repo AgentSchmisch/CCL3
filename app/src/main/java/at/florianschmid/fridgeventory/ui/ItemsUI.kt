@@ -1,6 +1,5 @@
 package at.florianschmid.fridgeventory.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -47,21 +47,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import at.florianschmid.fridgeventory.data.Item
-import at.florianschmid.fridgeventory.ui.add.TaskAddScreen
-import at.florianschmid.fridgeventory.ui.edit.TaskEditScreen
-import at.florianschmid.fridgeventory.ExpiringItems.theme.Typography
+import at.florianschmid.fridgeventory.ui.add.ItemAddScreen
+import at.florianschmid.fridgeventory.ui.edit.ItemEditScreen
+import at.florianschmid.fridgeventory.ui.theme.Typography
 import at.florianschmid.fridgeventory.R
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import java.time.format.DateTimeFormatter
 
+
 enum class ItemRoutes(val route: String) {
-    Home("task/home"),
-    Detail("task/details/{itemId}"),
-    Edit("task/details/{itemId}/edit"),
-    Add("task/new")
+    Home("fridgeventory/home"),
+    Detail("fridgeventory/details/{itemId}"),
+    Edit("fridgeventory/details/{itemId}/edit"),
+    Add("fridgeventory/new")
 }
 
 @Composable
-fun TodoApp(modifier: Modifier = Modifier) {
+fun FridgeventoryApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     NavHost(
@@ -70,15 +74,12 @@ fun TodoApp(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable(ItemRoutes.Home.route) {
-            ContactsHomeScreen(
+            ItemsHomeScreen(
                 onEditClick = {
                     navController.navigate(ItemRoutes.Edit.route.replace("{itemId}", "$it"))
                 },
                 onAddClick = {
                     navController.navigate(ItemRoutes.Add.route) // Navigate to Add route
-                },
-                onCardClick = {
-                    navController.navigate(ItemRoutes.Edit.route.replace("{itemId}", "$it"))
                 }
             )
         }
@@ -88,15 +89,17 @@ fun TodoApp(modifier: Modifier = Modifier) {
                 type = NavType.IntType
             })
         ) {
-            TaskDetailsScreen()
+            ItemsDetailsScreen()
         }
 
         composable(
             route = ItemRoutes.Add.route
         ) {
-            TaskAddScreen {
-                navController.navigateUp()
-            }
+            ItemAddScreen(
+                onSave = {
+                    navController.navigateUp()
+                }
+            )
         }
 
         composable(
@@ -105,63 +108,65 @@ fun TodoApp(modifier: Modifier = Modifier) {
                 type = NavType.IntType
             })
         ) {
-            TaskEditScreen {
+            ItemEditScreen {
                 navController.navigateUp()
             }
         }
     }
 }
 
+
 @Composable
-fun ContactsHomeScreen(
+fun ItemsHomeScreen(
     modifier: Modifier = Modifier,
-    taskViewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    itemViewModel: ItemViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onEditClick: (Int) -> Unit,
     onAddClick: () -> Unit,
-    onCardClick: (Int) -> Unit,
 ) {
-    val state by taskViewModel.tasksUiState.collectAsStateWithLifecycle()
+    val state by itemViewModel.itemUiState.collectAsStateWithLifecycle()
 
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        // We use lazy column for dynamic lists or large lists
-        // it will only draw the visible contacts
-        Text("Items", style = Typography.titleLarge)
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Title at the top
+            Text("Fridgeventory", style=Typography.titleLarge, modifier = Modifier.padding(16.dp))
 
-        Spacer(Modifier.height(16.dp))
-
-        LazyColumn {
-            itemsIndexed(state.items) { _, item ->
-                TaskListItem(item,
-                    onCardClick = {
-                        onCardClick(item.id)
-                    },
-                    onEditClick = {
-                        onEditClick(item.id)
-                    },
-                    viewModel = taskViewModel
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                itemsIndexed(state.items) { _, item ->
+                    FridgeListItem(
+                        item,
+                        onEditClick = { onEditClick(item.id) },
+                        viewModel = itemViewModel
+                    )
+                }
             }
         }
 
-        AddTaskButton(onAddClick = onAddClick)
-
-
+        // Floating AddItemButton positioned at the bottom-right corner
+        AddItemButton(onAddClick = onAddClick)
     }
 }
 
+
+
+
 @Composable
-fun AddTaskButton(onAddClick: () -> Unit) {
+fun AddItemButton(onAddClick: () -> Unit) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
+        // Floating Surface (Add Button) at the bottom-right corner
         Surface(
             shape = CircleShape,
             color = colorResource(R.color.f_pink),
             shadowElevation = 8.dp,
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .size(56.dp)
+                .align(Alignment.BottomEnd) // Position the button at the bottom-right corner
+                .padding(16.dp) // Padding around the button
+                .size(56.dp) // Fixed size for the button to avoid squishing
         ) {
             Box(
                 modifier = Modifier
@@ -171,23 +176,21 @@ fun AddTaskButton(onAddClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add task",
+                    contentDescription = "Add item",
                     tint = Color.White,
-                    modifier = Modifier.size(32.dp) // Increase the size of the icon
+                    modifier = Modifier.size(32.dp) // Icon size inside the button
                 )
             }
         }
     }
 }
 
-
 @Composable
-fun TaskListItem(
+fun FridgeListItem(
     item: Item,
-    onCardClick: () -> Unit,
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TaskViewModel
+    viewModel: ItemViewModel
 ) {
     Card(
         onClick = { onEditClick() },
@@ -203,14 +206,7 @@ fun TaskListItem(
                 .fillMaxSize() // Box stretches to fill the card
         ) {
             // Background Image that completely fills the card
-            Image(
-                painter = painterResource(id = R.mipmap.apple_foreground),
-                contentDescription = "Apple",
-                modifier = Modifier
-                    .fillMaxSize() // Fill the Box entirely, no gaps
-                    .align(Alignment.Center), // Center image
-                contentScale = ContentScale.Crop // Crop image to fill card without distortion
-            )
+            LocalImageDisplay(item)
 
             // Overlay content (Text and Controls)
             Column(
@@ -283,7 +279,7 @@ fun TaskListItem(
 fun changeQuantity(
     item: Item,
     change: Int,
-    viewModel: TaskViewModel
+    viewModel: ItemViewModel
 ) {
     // Call ViewModel to handle quantity change
     if (change > 0) {
@@ -293,16 +289,30 @@ fun changeQuantity(
     }
 }
 
+@Composable
+fun LocalImageDisplay(item: Item) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(item.image_path)
+            .crossfade(true)
+            .build(),
+        placeholder = painterResource(R.drawable.apple_background),
+        contentDescription = "Image of ${item.name}",
+        contentScale = ContentScale.Crop,
+    )
+}
+
+
 
 @Composable
-fun TaskDetailsScreen(modifier: Modifier = Modifier, taskUpdateViewModel: TaskUpdateViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
-    val detailUiState by taskUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
-    TaskDetails(detailUiState.item, modifier)
+fun ItemsDetailsScreen(modifier: Modifier = Modifier, itemUpdateViewModel: ItemUpdateViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+    val detailUiState by itemUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
+    ItemDetails(detailUiState.item, modifier)
 }
 
 
 @Composable
-fun TaskDetails(item: Item, modifier: Modifier = Modifier) {
+fun ItemDetails(item: Item, modifier: Modifier = Modifier) {
     OutlinedCard(
         modifier
             .fillMaxWidth()

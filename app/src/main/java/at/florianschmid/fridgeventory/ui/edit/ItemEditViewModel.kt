@@ -13,16 +13,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
-data class ContactEditUi(
-    val item: Item = Item(0, "", LocalDateTime.of(2024,12,9,0,0), 5,"")
+data class ItemEditUi(
+    val item: Item = Item(0, "", LocalDateTime.of(2024,12,9,0,0), 5,"","")
 )
 
-class TaskEditViewModel(private val savedStateHandle: SavedStateHandle,
+class ItemEditViewModel(private val savedStateHandle: SavedStateHandle,
                         private val itemRepository: ItemRepository) : ViewModel() {
 
     private val itemId: Int = checkNotNull(savedStateHandle["itemId"])
 
-    var editUiState by mutableStateOf(ContactEditUi())
+    var editUiState by mutableStateOf(ItemEditUi())
         private set
 
     init {
@@ -30,7 +30,7 @@ class TaskEditViewModel(private val savedStateHandle: SavedStateHandle,
             val item = withContext(Dispatchers.IO) {
                 itemRepository.findItemById(itemId)
             }
-            editUiState = ContactEditUi(item)
+            editUiState = ItemEditUi(item)
         }
     }
 

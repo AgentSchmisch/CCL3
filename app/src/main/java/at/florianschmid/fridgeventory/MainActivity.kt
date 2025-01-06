@@ -4,7 +4,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,31 +15,40 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import android.Manifest
-import at.florianschmid.fridgeventory.ui.TodoApp
+import at.florianschmid.fridgeventory.ui.FridgeventoryApp
 import at.florianschmid.fridgeventory.ExpiringItems.theme.FridgeventoryTheme
+import java.util.concurrent.Executors
 
 
 class MainActivity : ComponentActivity() {
+    var cameraExecutor = Executors.newSingleThreadExecutor()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         requestNotificationPermission()
+        requestCameraPermission()
         setContent {
             FridgeventoryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TodoApp(Modifier.padding(innerPadding))
+                    FridgeventoryApp(Modifier.padding(innerPadding))
                 }
             }
         }
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 
     private var requestPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (!isGranted) {
-                Log.d("POST_NOTIFICATION_PERMISSION", "USER DENIED PERMISSION")
+                Log.d("PERMISSION_MANAGER", "USER DENIED PERMISSION")
             } else {
-                Log.d("POST_NOTIFICATION_PERMISSION", "USER GRANTED PERMISSION")
+                Log.d("PPERMISSION_MANAGER", "USER GRANTED PERMISSION")
             }
         }
 
@@ -48,27 +56,27 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permission = Manifest.permission.POST_NOTIFICATIONS
             when {
-                ContextCompat.checkSelfPermission(
-                    this, permission
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    // Action to take when permission is already granted
-                    Toast.makeText(this, "Permission granted", Toast.LENGTH_LONG).show()
-                }
-
-                shouldShowRequestPermissionRationale(permission) -> {
-                    // Action to take when permission was denied permanently
-                    Toast.makeText(this, "Permission denied permanently", Toast.LENGTH_LONG).show()
-                }
-
+                ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED ->
+                    {  }
                 else -> {
                     // Request permission
                     requestPermissionLauncher.launch(permission)
                 }
             }
-        } else {
-            // Device does not support required permission
-            Toast.makeText(this, "No required permission", Toast.LENGTH_LONG).show()
         }
     }
 
-}
+    private fun requestCameraPermission() {
+        val permission = Manifest.permission.CAMERA
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED -> { }
+                else -> {
+                    // Request permission if not granted
+                    requestPermissionLauncher.launch(permission)
+                }
+            }
+        }
+    }

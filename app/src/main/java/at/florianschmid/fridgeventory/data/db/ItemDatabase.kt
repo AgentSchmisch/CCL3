@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [ItemEntity::class], version = 1)
+@Database(entities = [ItemEntity::class], version = 2)
 @TypeConverters(Converters::class) // add the date converters to the database
 abstract class ItemDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
@@ -18,7 +18,7 @@ abstract class ItemDatabase : RoomDatabase() {
         fun getDatabase(context: Context): ItemDatabase {
             // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
-                val instance = Room.databaseBuilder(context, ItemDatabase::class.java, "task_database")
+                val instance = Room.databaseBuilder(context, ItemDatabase::class.java, "fridgeventory_database")
                     /**
                      * Setting this option in your app's database builder means that Room
                      * permanently deletes all data from the tables in your database when it

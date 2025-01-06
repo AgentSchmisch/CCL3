@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class TaskViewModel(val repository: ItemRepository, val context: Context) : ViewModel() {
+class ItemViewModel(val repository: ItemRepository, val context: Context) : ViewModel() {
 
     init {
         viewModelScope.launch {
@@ -39,24 +39,22 @@ class TaskViewModel(val repository: ItemRepository, val context: Context) : View
     }
 
     private fun enqueueExpiryNotificationWorker() {
-
         // Create the worker request
         val workRequest: WorkRequest = PeriodicWorkRequest.Builder(
             ExpiryNotificationWorker::class.java,
-            30, // Interval duration
-            TimeUnit.MINUTES // Interval time unit
-        )
-        .build()
+            12, // Interval duration
+            TimeUnit.HOURS // Interval time unit
+        ).build()
 
         // Enqueue the worker
         WorkManager.getInstance(context).enqueue(workRequest)
     }
 
-    val tasksUiState = repository.getAllItems()
-        .map { TasksUiState(it) }
+    val itemUiState = repository.getAllItems()
+        .map { ItemUiState(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = TasksUiState(emptyList())
+            initialValue = ItemUiState(emptyList())
         )
 }

@@ -29,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,18 +36,17 @@ import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.AppViewModelProvider
 import at.florianschmid.fridgeventory.ui.add.convertMillisToDate
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun TaskEditScreen(
+fun ItemEditScreen(
     modifier: Modifier = Modifier,
-    viewModel: TaskEditViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: ItemEditViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onSave: () -> Unit
 ) {
     val item = viewModel.editUiState.item
-    TaskEditForm(item, modifier, onValueChange = { contactChanged ->
-        viewModel.updateItem(contactChanged)
+    ItemEditForm(item, modifier, onValueChange = { itemChanged ->
+        viewModel.updateItem(itemChanged)
     }) {
         viewModel.saveItem()
         onSave()
@@ -57,7 +55,7 @@ fun TaskEditScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskEditForm(
+fun ItemEditForm(
     item: Item,
     modifier: Modifier = Modifier,
     onValueChange: (Item) -> Unit = {},
@@ -144,10 +142,4 @@ fun TaskEditForm(
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun ContactEditPreview() {
-    TaskEditForm(Item(0, "Apples", LocalDateTime.of(2024,12,9,0,0), 5,"")) { }
 }
