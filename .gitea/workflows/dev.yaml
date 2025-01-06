@@ -1,11 +1,11 @@
-name: Build Android APK
+name: Build and Test Android App
 
 on:
   push:
-    branches:
+    branches-ignore:
       - master
   pull_request:
-    branches:
+    branches-ignore:
       - master
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip          
+          sudo apt-get install -y wget unzip                    
 
       # Step 4: Install Android SDK
       - name: Install Android SDK
@@ -42,17 +42,17 @@ jobs:
           echo "ANDROID_HOME=$SDK_ROOT" >> $GITHUB_ENV
           echo "PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
           export ANDROID_HOME=$SDK_ROOT
-          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH          
+          export PATH=$SDK_ROOT/cmdline-tools/tools/bin:$SDK_ROOT/platform-tools:$PATH                    
 
       # Step 5: Accept SDK Licenses
       - name: Accept SDK Licenses
         run: |
-          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses || true          
+          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses || true                    
 
       # Step 6: Install SDK Components
       - name: Install SDK Components
         run: |
-          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"          
+          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"                    
 
       # Step 7: Make gradlew executable
       - name: Make gradlew executable
@@ -65,34 +65,11 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-            
+            ${{ runner.os }}-gradle-                        
 
       # Step 9: Build the APK
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # Step 10: Upload the APK as an artifact
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-debug.apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-
-      # Step 11: Upload APK to Gitea
-      - name: Upload APK to Gitea
-        env:
-          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-          ANDROID_REPO: ${{ secrets.ANDROID_REPO }}
-        run: |
-          APK_PATH=app/build/outputs/apk/debug/app-debug.apk
-          if [ -f "$APK_PATH" ]; then
-            echo "Using the following URL: $ANDROID_REPO"  # Debug the URL
-            curl -X POST \
-              -H "Authorization: token $REPO_TOKEN" \
-              -F "files[]=@$APK_PATH" \
-              "$ANDROID_REPO"
-          else
-            echo "APK not found at $APK_PATH"
-            exit 1
-          fi
+    
 
