@@ -62,9 +62,18 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
 
-    // okHttp for api calls
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-    implementation("com.google.code.gson:gson:2.10.1")
+
+
+    //camera
+    val camera_ver = "1.4.1"
+    implementation ("androidx.camera:camera-core:$camera_ver")
+    implementation ("androidx.camera:camera-lifecycle:$camera_ver")
+    implementation ("androidx.camera:camera-view:$camera_ver")
+    implementation ("androidx.camera:camera-camera2:$camera_ver")
+
+    implementation ("androidx.activity:activity-ktx:1.9.3")
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -14,10 +14,10 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 data class ItemDetailUi(
-    val item: Item = Item(0, "", LocalDateTime.of(2024,12,9,0,0), 1, "")
+    val item: Item = Item(0, "", LocalDateTime.of(2024,12,9,0,0), 1, "","")
 )
 
-class TaskUpdateViewModel(savedStateHandle: SavedStateHandle, private val itemRepository: ItemRepository): ViewModel() {
+class ItemUpdateViewModel(savedStateHandle: SavedStateHandle, private val itemRepository: ItemRepository): ViewModel() {
 
     private val itemId: Int = checkNotNull(savedStateHandle["itemId"])
 

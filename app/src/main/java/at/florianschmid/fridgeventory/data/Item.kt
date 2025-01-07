@@ -7,5 +7,7 @@ data class Item(
     val name: String,
     val expiry_date: LocalDateTime,
     var quantity: Int,
-    val additional: String
-)
+    val additional: String,
+    var image_path: String
+
+    )

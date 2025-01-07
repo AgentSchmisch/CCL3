@@ -10,27 +10,27 @@ import at.florianschmid.fridgeventory.data.ItemRepository
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-data class TaskAddUi(
-    val item: Item = Item(0, "", LocalDateTime.now(), 5,"")
+data class ItemAddUi(
+    val item: Item = Item(0, "", LocalDateTime.now(), 5,"","")
 )
 
-class TaskAddViewModel(private val itemRepository: ItemRepository) : ViewModel() {
+class ItemAddViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
-    var addUiState by mutableStateOf(TaskAddUi())
+    var addUiState by mutableStateOf(ItemAddUi())
         private set
 
     init {
         viewModelScope.launch {
-            val item = Item(0, "", LocalDateTime.now(), 5,"")
-            addUiState = TaskAddUi(item)
+            val item = Item(0, "", LocalDateTime.now(), 5,"","")
+            addUiState = ItemAddUi(item)
         }
     }
 
-    fun updateTask(item: Item) {
+    fun updateItem(item: Item) {
         addUiState = addUiState.copy(item = item)
     }
 
-    fun saveTask() {
+    fun saveItem() {
         viewModelScope.launch {
             itemRepository.addItem(addUiState.item)
         }

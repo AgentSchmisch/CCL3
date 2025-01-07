@@ -12,4 +12,5 @@ data class ItemEntity(
     val expiry_date:  LocalDateTime,
     var quantity: Int,
     val additional: String,
+    val image_path: String
 )

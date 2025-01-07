@@ -15,7 +15,8 @@ class ItemRepository(private val itemDao: ItemDao) {
                     item.name,
                     item.expiry_date,
                     item.quantity,
-                    item.additional
+                    item.additional,
+                    item.image_path
                 )
             }
         }
@@ -28,17 +29,18 @@ class ItemRepository(private val itemDao: ItemDao) {
             item.name,
             item.expiry_date,
             item.quantity,
-            item.additional
+            item.additional,
+            item.image_path
         )
     }
 
 
     suspend fun addItem(item:Item) {
-        itemDao.addItem(ItemEntity(_id=0, item.name, item.expiry_date, item.quantity, item.additional))
+        itemDao.addItem(ItemEntity(_id=0, item.name, item.expiry_date, item.quantity, item.additional, item.image_path))
     }
 
     suspend fun updateItem(item: Item) {
-        itemDao.updateItem(ItemEntity(item.id, item.name, item.expiry_date, item.quantity, item.additional))
+        itemDao.updateItem(ItemEntity(item.id, item.name, item.expiry_date, item.quantity, item.additional, item.image_path))
     }
 
     fun findItemsExpiringSoon(): Flow<List<Item>> {
@@ -49,7 +51,8 @@ class ItemRepository(private val itemDao: ItemDao) {
                     item.name,
                     item.expiry_date,
                     item.quantity,
-                    item.additional
+                    item.additional,
+                    item.image_path
                 )
             }
         }
