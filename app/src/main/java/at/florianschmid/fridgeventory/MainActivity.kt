@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import android.Manifest
 import at.florianschmid.fridgeventory.ui.FridgeventoryApp
-import at.florianschmid.fridgeventory.ExpiringItems.theme.FridgeventoryTheme
+import at.florianschmid.fridgeventory.ui.theme.FridgeventoryTheme
 import java.util.concurrent.Executors
 
 
