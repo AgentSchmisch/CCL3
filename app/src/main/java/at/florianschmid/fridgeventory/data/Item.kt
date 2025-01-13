@@ -5,9 +5,10 @@ import java.time.LocalDateTime
 data class Item(
     val id: Int,
     val name: String,
-    val expiry_date: LocalDateTime,
+    val expiry_date: LocalDateTime = LocalDateTime.now(),
     var quantity: Int,
     val additional: String,
-    var image_path: String
+    var image_path: String,
+    var checkedForRecipe: Boolean = false
 
     )

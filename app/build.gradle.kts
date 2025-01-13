@@ -62,6 +62,8 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
 
+    //remote service
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 
     //camera
