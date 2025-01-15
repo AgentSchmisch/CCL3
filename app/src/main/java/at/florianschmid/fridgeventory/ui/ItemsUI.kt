@@ -28,11 +28,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,11 +45,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import at.florianschmid.fridgeventory.ExpiringItems.ExpiringItemsUI
 import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecipeUI
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.add.ItemAddScreen
@@ -62,73 +65,85 @@ import coil3.request.crossfade
 import java.time.format.DateTimeFormatter
 
 
-enum class ItemRoutes(val route: String) {
+enum class Routes(val route: String) {
     Home("fridgeventory/home"),
     Detail("fridgeventory/details/{itemId}"),
     Edit("fridgeventory/details/{itemId}/edit"),
-    Add("fridgeventory/new")
+    Add("fridgeventory/new"),
+    Expiring("fridgeventory/expiring"),
+    RecipeHome("fridgeventory/recipes"),
+    RecipeDetail("fridgeventory/recipes/{recipeId}"),
 
 }
 
-enum class RecipeRoutes(val route: String) {
-    Home("fridgeventory/recipes"),
-    Detail("fridgeventory/recipes/{recipeId}"),
-}
 
 @Composable
 fun FridgeventoryApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        bottomBar = { Footer(navController) }
+    ) { innerPadding ->
 
-    NavHost(
-        navController = navController,
-        startDestination = ItemRoutes.Home.route,
-        modifier = modifier
-    ) {
-        composable(ItemRoutes.Home.route) {
-            ItemsHomeScreen(
-                onEditClick = {
-                    navController.navigate(ItemRoutes.Edit.route.replace("{itemId}", "$it"))
-                },
-                onAddClick = {
-                    navController.navigate(ItemRoutes.Add.route) // Navigate to Add route
-                }
-            )
-        }
-        composable (
-            route = ItemRoutes.Detail.route,
-            arguments = listOf(navArgument("itemId") {
-                type = NavType.IntType
-            })
+        NavHost(
+            navController = navController,
+            startDestination = Routes.Home.route,
+            modifier = modifier
         ) {
-            ItemsDetailsScreen()
-        }
+            composable(Routes.Home.route) {
+                ItemsHomeScreen(
+                    onEditClick = {
+                        navController.navigate(Routes.Edit.route.replace("{itemId}", "$it"))
+                    },
+                    onAddClick = {
+                        navController.navigate(Routes.Add.route) // Navigate to Add route
+                    },
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+            composable(
+                route = Routes.Detail.route,
+                arguments = listOf(navArgument("itemId") {
+                    type = NavType.IntType
+                })
+            ) {
+                ItemsDetailsScreen()
+            }
 
-        composable(
-            route = ItemRoutes.Add.route
-        ) {
-            ItemAddScreen(
-                onSave = {
+            composable(
+                route = Routes.Add.route
+            ) {
+                ItemAddScreen(
+                    onSave = {
+                        navController.navigateUp()
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.Edit.route,
+                arguments = listOf(navArgument("itemId") {
+                    type = NavType.IntType
+                })
+            ) {
+                ItemEditScreen {
                     navController.navigateUp()
                 }
-            )
-        }
+            }
 
-        composable(
-            route = ItemRoutes.Edit.route,
-            arguments = listOf(navArgument("itemId") {
-                type = NavType.IntType
-            })
-        ) {
-            ItemEditScreen {
-                navController.navigateUp()
+            composable(
+                route = Routes.Expiring.route
+            ){
+                ExpiringItemsUI()
             }
-        }
-        composable(
-            route = RecipeRoutes.Home.route
-        ) {
-            RecipeUI {
-                navController.navigateUp()
+
+            composable(
+                route = Routes.RecipeHome.route
+            ) {
+                RecipeUI {
+                    navController.navigateUp()
+                }
             }
+
         }
     }
 }
@@ -349,44 +364,48 @@ fun ItemDetails(item: Item, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Footer() {
-        NavigationBar(
-            containerColor = colorResource(R.color.f_dark_purple)
-        ) {
-            NavigationBarItem(
-                onClick = {  },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_home_24),
-                        contentDescription = "Home"
-                    )
-                },
-                selected = true,
-            )
+fun Footer(navController: NavController) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val currentScreen = Routes.values().find { it.route == currentRoute } ?: Routes.Home
 
-            NavigationBarItem(
-                onClick = {  },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_access_time_24),
-                        contentDescription = "Expiring Items"
-                    )
-                },
-                selected = false,
-            )
+    NavigationBar(
+        containerColor = colorResource(R.color.f_dark_purple)
+    ) {
+        NavigationBarItem(
+            onClick = { navController.navigate(Routes.Home.route) },
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_home_24),
+                    contentDescription = "Home"
+                )
+            },
+            selected = currentScreen == Routes.Home
+        )
 
-            NavigationBarItem(
-                onClick = {  },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_soup_kitchen_24),
-                        contentDescription = "Recipes"
-                    )
-                },
-                selected = false,
-            )
-        }
+        NavigationBarItem(
+            onClick = { navController.navigate(Routes.Expiring.route) },
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_access_time_24),
+                    contentDescription = "Expiring Items"
+                )
+            },
+            selected = currentScreen == Routes.Expiring
+        )
+
+        NavigationBarItem(
+            onClick = { navController.navigate(Routes.RecipeHome.route) },
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_soup_kitchen_24),
+                    contentDescription = "Recipes"
+                )
+            },
+            selected = currentScreen == Routes.RecipeHome
+        )
     }
+}
+
 
 
 @Composable
@@ -398,5 +417,5 @@ fun AddItemButtonPreview() {
 @Composable
 @Preview
 fun FooterPreview() {
-    Footer()
+    Footer(rememberNavController())
 }

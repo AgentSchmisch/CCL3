@@ -13,13 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.IntentCompat.getParcelableArrayListExtra
 import at.florianschmid.fridgeventory.data.Recipe
 import coil3.compose.AsyncImage
-import kotlinx.serialization.json.Json.Default.parseToJsonElement
 
 
-
-
-
-fun RecipeUI(modifier: Modifier = Modifier, onClose: ()->Unit) {
+fun RecipeUI(modifier: Modifier = Modifier, onClose: () -> Unit) {
 
 
 }
@@ -48,6 +44,6 @@ fun ImageDisplay(recipe: Recipe) {
 @Composable
 @Preview
 fun RecommendationPreview() {
-    val recipe = Recipe(parseToJsonElement("{\"id\": 1, \"title\": \"Test\", \"image\": \"https://img.spoonacular.com/recipes/673463-312x231.jpg\", \"usedIngredientCount\": 1, \"missedIngredientCount\": 1, \"missedIngredients\": [], \"usedIngredients\": [], \"unusedIngredients\": [], \"likes\": 1}"))
-    RecommendationCard(recipe)
+    //val recipe = Recipe(parseToJsonElement("{\"id\": 1, \"title\": \"Test\", \"image\": \"https://img.spoonacular.com/recipes/673463-312x231.jpg\", \"usedIngredientCount\": 1, \"missedIngredientCount\": 1, \"missedIngredients\": [], \"usedIngredients\": [], \"unusedIngredients\": [], \"likes\": 1}"))
+    //RecommendationCard(recipe)
 }
