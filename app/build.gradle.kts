@@ -74,8 +74,11 @@ dependencies {
     implementation ("androidx.camera:camera-camera2:$camera_ver")
 
     implementation ("androidx.activity:activity-ktx:1.9.3")
-    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
 
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

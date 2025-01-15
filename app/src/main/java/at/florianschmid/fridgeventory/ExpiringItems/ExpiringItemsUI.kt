@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import at.florianschmid.fridgeventory.ui.theme.Typography
 import at.florianschmid.fridgeventory.R
 import at.florianschmid.fridgeventory.data.Item
+import at.florianschmid.fridgeventory.data.remote.RemoteService
 import at.florianschmid.fridgeventory.ui.LocalImageDisplay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -46,12 +47,12 @@ fun ExpiringItemsUI(
         }
 
         Spacer(Modifier.height(16.dp))
-        createRecipeButton { onCreateRecipeClick(recipeItems) }
+        CreateRecipeButton { onCreateRecipeClick(recipeItems) }
     }
 }
 
 @Composable
-fun createRecipeButton(onClick: () -> Unit) {
+fun CreateRecipeButton(onClick: () -> Unit) {
     Button(onClick = onClick) {
         Text("Create Recipe")
     }
@@ -140,6 +141,11 @@ fun checkBoxChanged(item: Item, recipeItems: SnapshotStateList<Item>) {
 fun onCreateRecipeClick(recipeItems: List<Item>) {
     // Simulate creating a recipe with selected items
     println("Creating recipe with: $recipeItems")
+    // call the remote service to get recipes
+    val recipeRecommendations = RemoteService().fetchRecipeRecommendations(recipeItems)
+
+    // navigate to the recipe screen
+
 }
 
 @Composable

@@ -24,7 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Flori\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="C:\Users\Florian\AppData\Local\Temp\ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -67,7 +67,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="imagePath" value="C:\Users\Flori\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="C:\Users\Florian\AppData\Local\Temp\ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -79,8 +79,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Flori\Downloads\apfel-sorten.webp" />
-                                                <entry key="scalingPercent" value="181" />
+                                                <entry key="imagePath" value="C:\Users\Florian\Downloads\icons8-expired-24.png" />
+                                                <entry key="scalingPercent" value="47" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -112,6 +112,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="foregroundLayerName" value="baseline_expired_24" />
                                       <entry key="outputName" value="apple" />
                                     </map>
                                   </option>
@@ -129,7 +130,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Flori\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="C:\Users\Florian\AppData\Local\Temp\ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -173,7 +174,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Flori\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="C:\Users\Florian\AppData\Local\Temp\ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -237,7 +238,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="imagePath" value="C:\Users\Flori\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                                <entry key="imagePath" value="C:\Users\Florian\AppData\Local\Temp\ic_android_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -306,7 +307,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/timer/baseline_timer_24.xml" />
+                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/access_time/baseline_access_time_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -316,7 +317,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="baseline_timer_24" />
+                            <entry key="outputName" value="baseline_access_time_24" />
                             <entry key="sourceFile" value="C:\Users\Flori\AndroidStudioProjects\Fridgeventory" />
                           </map>
                         </option>

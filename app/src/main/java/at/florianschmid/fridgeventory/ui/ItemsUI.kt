@@ -25,11 +25,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,6 +50,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecipeUI
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.add.ItemAddScreen
 import at.florianschmid.fridgeventory.ui.edit.ItemEditScreen
@@ -62,6 +67,12 @@ enum class ItemRoutes(val route: String) {
     Detail("fridgeventory/details/{itemId}"),
     Edit("fridgeventory/details/{itemId}/edit"),
     Add("fridgeventory/new")
+
+}
+
+enum class RecipeRoutes(val route: String) {
+    Home("fridgeventory/recipes"),
+    Detail("fridgeventory/recipes/{recipeId}"),
 }
 
 @Composable
@@ -112,6 +123,13 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
                 navController.navigateUp()
             }
         }
+        composable(
+            route = RecipeRoutes.Home.route
+        ) {
+            RecipeUI {
+                navController.navigateUp()
+            }
+        }
     }
 }
 
@@ -145,7 +163,7 @@ fun ItemsHomeScreen(
         }
 
         // Floating AddItemButton positioned at the bottom-right corner
-        AddItemButton(onAddClick = onAddClick)
+        AddItemButton(onAddClick)
     }
 }
 
@@ -180,6 +198,7 @@ fun AddItemButton(onAddClick: () -> Unit) {
                     tint = Color.White,
                     modifier = Modifier.size(32.dp) // Icon size inside the button
                 )
+                Spacer(modifier = Modifier.width(56.dp)) // Add space between icon and text
             }
         }
     }
@@ -327,4 +346,57 @@ fun ItemDetails(item: Item, modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+@Composable
+fun Footer() {
+        NavigationBar(
+            containerColor = colorResource(R.color.f_dark_purple)
+        ) {
+            NavigationBarItem(
+                onClick = {  },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_home_24),
+                        contentDescription = "Home"
+                    )
+                },
+                selected = true,
+            )
+
+            NavigationBarItem(
+                onClick = {  },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_access_time_24),
+                        contentDescription = "Expiring Items"
+                    )
+                },
+                selected = false,
+            )
+
+            NavigationBarItem(
+                onClick = {  },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_soup_kitchen_24),
+                        contentDescription = "Recipes"
+                    )
+                },
+                selected = false,
+            )
+        }
+    }
+
+
+@Composable
+@Preview
+fun AddItemButtonPreview() {
+    AddItemButton {}
+}
+
+@Composable
+@Preview
+fun FooterPreview() {
+    Footer()
 }

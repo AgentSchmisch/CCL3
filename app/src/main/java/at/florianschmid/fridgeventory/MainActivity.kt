@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import android.Manifest
+import at.florianschmid.fridgeventory.ui.Footer
 import at.florianschmid.fridgeventory.ui.FridgeventoryApp
 import at.florianschmid.fridgeventory.ui.theme.FridgeventoryTheme
 import java.util.concurrent.Executors
@@ -31,9 +32,7 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         setContent {
             FridgeventoryTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    FridgeventoryApp(Modifier.padding(innerPadding))
-                }
+                MainView()
             }
         }
     }
@@ -59,7 +58,6 @@ class MainActivity : ComponentActivity() {
                 ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED ->
                     {  }
                 else -> {
-                    // Request permission
                     requestPermissionLauncher.launch(permission)
                 }
             }
