@@ -14,3 +14,13 @@ data class ItemEntity(
     val additional: String,
     val image_path: String
 )
+
+@Entity(tableName = "reciperecommendations")
+data class RecommendationEntity(
+    @PrimaryKey(autoGenerate = false)
+    val _id: Int,
+    val title:String,
+    val usedIngredients:Int,
+    val missingIngredients:Int,
+    val image_path: String
+)

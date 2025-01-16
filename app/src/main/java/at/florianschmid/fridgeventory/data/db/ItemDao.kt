@@ -28,4 +28,5 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE expiry_date BETWEEN date('now') AND date('now', '+2 days') AND quantity > 0 ORDER BY expiry_date ASC")
     fun getItemsExpiringSoon(): Flow<List<ItemEntity>>
 
+
 }

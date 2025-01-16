@@ -66,13 +66,15 @@ import java.time.format.DateTimeFormatter
 
 
 enum class Routes(val route: String) {
+
     Home("fridgeventory/home"),
     Detail("fridgeventory/details/{itemId}"),
     Edit("fridgeventory/details/{itemId}/edit"),
     Add("fridgeventory/new"),
     Expiring("fridgeventory/expiring"),
     RecipeHome("fridgeventory/recipes"),
-    RecipeDetail("fridgeventory/recipes/{recipeId}"),
+    RecipeRecommendations("fridgeventory/recipes/recommendations"),
+    RecipeDetail("fridgeventory/recipes/{recipeId}")
 
 }
 
@@ -133,17 +135,21 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
             composable(
                 route = Routes.Expiring.route
             ){
-                ExpiringItemsUI()
+                ExpiringItemsUI(navController = navController)
             }
 
             composable(
                 route = Routes.RecipeHome.route
             ) {
-                RecipeUI {
-                    navController.navigateUp()
-                }
+                RecipeUI(
+                    onClose = { navController.navigateUp() }
+                )
             }
-
+            composable(route = Routes.RecipeRecommendations.route) {
+                RecipeUI(
+                    onClose = { navController.navigateUp() }
+                )
+            }
         }
     }
 }
@@ -161,7 +167,7 @@ fun ItemsHomeScreen(
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Title at the top
-            Text("Fridgeventory", style=Typography.titleLarge, modifier = Modifier.padding(16.dp))
+            Text("Fridgeventory", style=Typography.titleLarge, modifier = Modifier.padding(16.dp), color = colorResource(R.color.f_dark_purple))
 
             LazyColumn(
                 modifier = Modifier

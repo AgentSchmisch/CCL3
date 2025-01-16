@@ -66,7 +66,7 @@ fun CameraUI(modifier: Modifier = Modifier) {
             .fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
     ) {
-        ImageTrigger(modifier=Modifier.padding(bottom=56.dp).size(105.dp),onClick = { takeImage(context, imageCapture) })
+        ImageTrigger(modifier=Modifier.padding(bottom=56.dp).size(105.dp), onClick = { takeImage(context, imageCapture) })
         Spacer(modifier = Modifier.size(16.dp))
     }
 }

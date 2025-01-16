@@ -18,11 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecommendationUiState
+import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecommendationViewModel
 import at.florianschmid.fridgeventory.ui.theme.Typography
 import at.florianschmid.fridgeventory.R
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.data.remote.RemoteService
 import at.florianschmid.fridgeventory.ui.LocalImageDisplay
+import at.florianschmid.fridgeventory.ui.Routes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -30,10 +34,12 @@ import java.time.format.DateTimeFormatter
 fun ExpiringItemsUI(
     modifier: Modifier = Modifier,
     itemsViewModel: ExpiringViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    recommendationViewModel: RecommendationViewModel = viewModel(),
+    navController: NavController
 ) {
-    // Collect the state from the ViewModel
     val state by itemsViewModel.expiringItemsUiState.collectAsStateWithLifecycle()
-    // Use mutableStateListOf for recipe items
+    val recipeRecommendations by recommendationViewModel.recommendationUiState.collectAsStateWithLifecycle()
+
     val recipeItems = remember { mutableStateListOf<Item>() }
 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -47,7 +53,19 @@ fun ExpiringItemsUI(
         }
 
         Spacer(Modifier.height(16.dp))
-        CreateRecipeButton { onCreateRecipeClick(recipeItems) }
+        CreateRecipeButton {
+            recommendationViewModel.fetchRecommendations(recipeItems)
+        }
+
+        // Display recommendations
+        if (recipeRecommendations.items.isNotEmpty()) {
+            LazyColumn {
+                itemsIndexed(recipeRecommendations.items) { _, recipe ->
+                    Text(recipe.title, style = Typography.bodyLarge)
+                }
+            }
+        }
+
     }
 }
 
@@ -138,14 +156,14 @@ fun checkBoxChanged(item: Item, recipeItems: SnapshotStateList<Item>) {
     }
 }
 
-fun onCreateRecipeClick(recipeItems: List<Item>) {
+suspend fun onCreateRecipeClick(recipeItems: List<Item>, recipeRecommendationsUiState: RecommendationUiState) {
     // Simulate creating a recipe with selected items
     println("Creating recipe with: $recipeItems")
     // call the remote service to get recipes
     val recipeRecommendations = RemoteService().fetchRecipeRecommendations(recipeItems)
-
-    // navigate to the recipe screen
-
+    println(recipeRecommendations)
+    // write the result to the viewModel
+    recipeRecommendationsUiState.items = recipeRecommendations
 }
 
 @Composable

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import at.florianschmid.fridgeventory.ExpiringItems.ExpiringItemsUI
 import at.florianschmid.fridgeventory.ui.theme.FridgeventoryTheme
 
@@ -18,7 +19,7 @@ class ExpiringItemsActivity : ComponentActivity() {
         setContent {
             FridgeventoryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ExpiringItemsUI(Modifier.padding(innerPadding))
+                    ExpiringItemsUI(Modifier.padding(innerPadding), navController = rememberNavController())
                 }
             }
         }
