@@ -51,12 +51,6 @@ class AppModule {
         return WorkManager.getInstance(appContext)
     }
 
-    @Provides
-    @Singleton
-    fun provideRecommendationDao(database: ItemDatabase): RecommendationDao {
-        return database.recommendationDao()
-    }
-
 
     @Provides
     @Singleton

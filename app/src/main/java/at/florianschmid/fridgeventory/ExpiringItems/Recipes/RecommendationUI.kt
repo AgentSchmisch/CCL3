@@ -26,14 +26,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import at.florianschmid.fridgeventory.R
-import at.florianschmid.fridgeventory.data.Recipe
+import at.florianschmid.fridgeventory.data.RecipeRecommendation
+import coil3.compose.AsyncImage
 import kotlinx.serialization.json.Json.Default.parseToJsonElement
 
 
 @Composable
-fun RecipeUI(modifier: Modifier = Modifier, onClose: ()->Unit, recommendationViewModel: RecommendationViewModel = hiltViewModel()) {
+fun RecipeUI(
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit,
+    recommendationViewModel: RecommendationViewModel = hiltViewModel()
+) {
     val state by recommendationViewModel.recommendations.collectAsStateWithLifecycle()
 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -51,7 +55,7 @@ fun RecipeUI(modifier: Modifier = Modifier, onClose: ()->Unit, recommendationVie
 
 
 @Composable
-fun RecommendationCard(recipe: Recipe, modifier: Modifier = Modifier) {
+fun RecommendationCard(recipeRecommendation: RecipeRecommendation, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -62,53 +66,68 @@ fun RecommendationCard(recipe: Recipe, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically // Align items vertically
         ) {
             // Image
-            ImageDisplay(recipe)
+            ImageDisplay(recipeRecommendation)
 
             // Column for details
             Column(
                 modifier = Modifier
                     .weight(1f) // Take up the remaining horizontal space
-                    .padding(start = 8.dp) // Add spacing between image and content
+                .padding(start = 8.dp), // Add spacing between image and content
+
+                verticalArrangement = Arrangement.Center // Align items vertically
+
             ) {
                 // Title
                 Text(
-                    text = recipe.title,
+                    text = recipeRecommendation.title,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(8.dp)
-                )
 
-                // Ingredients info
-                Text(
-                    text = "Used Ingredients: ${recipe.usedIngredientCount}",
-                    modifier = Modifier.padding(8.dp)
                 )
-                Text(
-                    text = "Missing Ingredients: ${recipe.missedIngredientCount}",
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-
-            // Row for likes
-            Row(
-                modifier = Modifier.padding(8.dp),
-                horizontalArrangement = Arrangement.Center, // Centers content horizontally
-                verticalAlignment = Alignment.CenterVertically // Centers content vertically
-            ) {
-                Text(recipe.likes.toString(), modifier = Modifier.padding(end = 4.dp))
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Heart",
-                    modifier = Modifier.size(24.dp) // Adjust icon size if needed
-                )
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                Column() {
+                    // Ingredients info
+                    Text(
+                        text = "Used Ingredients: ${recipeRecommendation.usedIngredientCount}",
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    Text(
+                        text = "Missing Ingredients: ${recipeRecommendation.missedIngredientCount}",
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+                    // Row for likes
+                    Row(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalArrangement = Arrangement.Center, // Centers content horizontally
+                        verticalAlignment = Alignment.CenterVertically // Centers content vertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Heart",
+                            modifier = Modifier.size(24.dp) // Adjust icon size if needed
+                        )
+                        Spacer(Modifier.size(4.dp))
+                        Text(recipeRecommendation.likes.toString(), modifier = Modifier.padding(end = 4.dp))
+                    }
+                }
             }
         }
     }
 }
 
 
-
 @Composable
-fun ImageDisplay(recipe: Recipe) {
+fun ImageDisplay(recipeRecommendation: RecipeRecommendation) {
+
+    AsyncImage(
+        model = recipeRecommendation.image,
+        contentDescription = "Image of ${recipeRecommendation.title}",
+    )
+
+
+
+
     Image(
         painter = painterResource(id = R.mipmap.recipe_foreground),
         contentDescription = "Apple",
@@ -120,6 +139,7 @@ fun ImageDisplay(recipe: Recipe) {
 @Composable
 @Preview
 fun RecommendationPreview() {
-    val recipe = Recipe(parseToJsonElement("{\"id\": 1, \"title\": \"Test\", \"image\": \"https://img.spoonacular.com/recipes/673463-312x231.jpg\", \"usedIngredientCount\": 1, \"missedIngredientCount\": 1, \"missedIngredients\": [], \"usedIngredients\": [], \"unusedIngredients\": [], \"likes\": 1}"))
-    RecommendationCard(recipe)
+    val recipeRecommendation =
+        RecipeRecommendation(parseToJsonElement("{\"id\": 1, \"title\": \"Easy Homemade Apple Fritters\", \"image\": \"https://img.spoonacular.com/recipes/673463-312x231.jpg\", \"usedIngredientCount\": 1, \"missedIngredientCount\": 1, \"missedIngredients\": [], \"usedIngredients\": [], \"unusedIngredients\": [], \"likes\": 1}"))
+    RecommendationCard(recipeRecommendation)
 }

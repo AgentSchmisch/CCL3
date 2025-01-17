@@ -6,9 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [ItemEntity::class, RecommendationEntity::class], version = 4)
+@Database(entities = [ItemEntity::class], version = 5)
 @TypeConverters(Converters::class) // add the date converters to the database
 abstract class ItemDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
-    abstract fun recommendationDao(): RecommendationDao
 }

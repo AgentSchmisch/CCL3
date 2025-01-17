@@ -6,16 +6,22 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-data class Recipe (
+data class RecipeRecommendation (
+    val recommendation: JsonElement
+){
+    val id: Int = recommendation.jsonObject["id"]!!.jsonPrimitive.int
+    val title: String = recommendation.jsonObject["title"]!!.jsonPrimitive.content
+    val image: String = recommendation.jsonObject["image"]!!.jsonPrimitive.content
+    val usedIngredientCount: Int = recommendation.jsonObject["usedIngredientCount"]!!.jsonPrimitive.int
+    val missedIngredientCount: Int = recommendation.jsonObject["missedIngredientCount"]!!.jsonPrimitive.int
+    val missedIngredients: JsonElement = parseToJsonElement(recommendation.jsonObject["missedIngredients"].toString())
+    val usedIngredients: JsonElement = parseToJsonElement(recommendation.jsonObject["usedIngrediens"].toString())
+    val unusedIngredients: JsonElement = parseToJsonElement(recommendation.jsonObject["unusedIngredients"].toString())
+    val likes: Int = recommendation.jsonObject["likes"]!!.jsonPrimitive.int
+}
+
+data class Recipe(
     val recipe: JsonElement
 ){
-    val id: Int = recipe.jsonObject["id"]!!.jsonPrimitive.int
-    val title: String = recipe.jsonObject["title"]!!.jsonPrimitive.content
-    val image: String = recipe.jsonObject["image"]!!.jsonPrimitive.content
-    val usedIngredientCount: Int = recipe.jsonObject["usedIngredientCount"]!!.jsonPrimitive.int
-    val missedIngredientCount: Int = recipe.jsonObject["missedIngredientCount"]!!.jsonPrimitive.int
-    val missedIngredients: JsonElement = parseToJsonElement(recipe.jsonObject["missedIngredients"].toString())
-    val usedIngredients: JsonElement = parseToJsonElement(recipe.jsonObject["usedIngrediens"].toString())
-    val unusedIngredients: JsonElement = parseToJsonElement(recipe.jsonObject["unusedIngredients"].toString())
-    val likes: Int = recipe.jsonObject["likes"]!!.jsonPrimitive.int
+    
 }
