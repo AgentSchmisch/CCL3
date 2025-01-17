@@ -43,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -158,7 +159,7 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
 @Composable
 fun ItemsHomeScreen(
     modifier: Modifier = Modifier,
-    itemViewModel: ItemViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    itemViewModel: ItemViewModel = hiltViewModel(),
     onEditClick: (Int) -> Unit,
     onAddClick: () -> Unit,
 ) {
@@ -345,7 +346,7 @@ fun LocalImageDisplay(item: Item) {
 
 
 @Composable
-fun ItemsDetailsScreen(modifier: Modifier = Modifier, itemUpdateViewModel: ItemUpdateViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun ItemsDetailsScreen(modifier: Modifier = Modifier, itemUpdateViewModel: ItemUpdateViewModel = hiltViewModel()) {
     val detailUiState by itemUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
     ItemDetails(detailUiState.item, modifier)
 }

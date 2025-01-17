@@ -4,10 +4,12 @@ import android.app.Application
 import at.florianschmid.fridgeventory.data.ItemRepository
 import at.florianschmid.fridgeventory.data.RecommendationRepository
 import at.florianschmid.fridgeventory.data.db.ItemDatabase
+import dagger.hilt.android.HiltAndroidApp
 
-class ItemApplication : Application() {
+@HiltAndroidApp
+class MainApplication : Application() {
 
-    val itemRepository by lazy {
+/*    val itemRepository by lazy {
         ItemRepository(
             ItemDatabase.getDatabase(this).itemDao()
         )
@@ -16,6 +18,6 @@ class ItemApplication : Application() {
         RecommendationRepository(
             ItemDatabase.getDatabase(this).recommendationDao()
         )
-    }
+    }*/
 
 }

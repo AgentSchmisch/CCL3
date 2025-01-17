@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import at.florianschmid.fridgeventory.ExpiringItems.ExpiringItemsUI
 import at.florianschmid.fridgeventory.ui.theme.FridgeventoryTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ExpiringItemsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

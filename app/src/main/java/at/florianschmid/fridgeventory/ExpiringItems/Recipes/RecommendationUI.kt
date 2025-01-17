@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import at.florianschmid.fridgeventory.R
@@ -31,9 +33,19 @@ import kotlinx.serialization.json.Json.Default.parseToJsonElement
 
 
 @Composable
-fun RecipeUI(modifier: Modifier = Modifier, onClose: ()->Unit, recommendationViewModel: RecommendationViewModel = viewModel()) {
-    val state = recommendationViewModel.recommendationUiState
+fun RecipeUI(modifier: Modifier = Modifier, onClose: ()->Unit, recommendationViewModel: RecommendationViewModel = hiltViewModel()) {
+    val state by recommendationViewModel.recommendations.collectAsStateWithLifecycle()
 
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Recipes")
+        Spacer(Modifier.height(16.dp))
+
+        LazyColumn {
+            itemsIndexed(state.items) { _, recipe ->
+                RecommendationCard(recipe)
+            }
+        }
+    }
 
 }
 

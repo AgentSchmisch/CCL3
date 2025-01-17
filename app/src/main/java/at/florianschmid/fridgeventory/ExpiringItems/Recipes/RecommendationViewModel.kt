@@ -9,34 +9,28 @@ import at.florianschmid.fridgeventory.data.RecommendationRepository
 import at.florianschmid.fridgeventory.data.db.ItemDao
 import at.florianschmid.fridgeventory.data.db.RecommendationDao
 import at.florianschmid.fridgeventory.data.remote.RemoteService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class RecommendationUiState(
     var items: List<Recipe> = emptyList()
 )
+@HiltViewModel
+class RecommendationViewModel @Inject constructor(private val remoteService: RemoteService, private val recipeService: RecipeService) : ViewModel() {
 
-class RecommendationViewModel(private val remoteService: RemoteService = RemoteService(), val repository: RecommendationRepository) : ViewModel() {
+    val recommendations = recipeService.recommendations
 
-    private val _recommendationUiState = MutableStateFlow(RecommendationUiState())
-    val recommendationUiState: StateFlow<RecommendationUiState> = _recommendationUiState
-
-    fun setRecommendation(recommendations: List<Recipe>) {
-        _recommendationUiState.update {
-            it.copy(items = recommendations)
-        }
-    }
 
     fun fetchRecommendations(ingredients: List<Item>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val recommendations = remoteService.fetchRecipeRecommendations(ingredients)
-                for (recipe in recommendations) {
-                    repository.addItem(recipe)
-                }
-                setRecommendation(recommendations)
+                recipeService.setRecommendations(recommendations)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

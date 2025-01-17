@@ -9,13 +9,16 @@ import androidx.work.WorkRequest
 import at.florianschmid.fridgeventory.ExpiryNotificationWorker
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.data.ItemRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class ItemViewModel(val repository: ItemRepository, val context: Context) : ViewModel() {
+@HiltViewModel
+class ItemViewModel @Inject constructor(private val repository: ItemRepository, private val workManager: WorkManager, private val workRequest: WorkRequest) : ViewModel() {
 
     init {
         viewModelScope.launch {
@@ -39,15 +42,8 @@ class ItemViewModel(val repository: ItemRepository, val context: Context) : View
     }
 
     private fun enqueueExpiryNotificationWorker() {
-        // Create the worker request
-        val workRequest: WorkRequest = PeriodicWorkRequest.Builder(
-            ExpiryNotificationWorker::class.java,
-            12, // Interval duration
-            TimeUnit.HOURS // Interval time unit
-        ).build()
-
         // Enqueue the worker
-        WorkManager.getInstance(context).enqueue(workRequest)
+        workManager.enqueue(workRequest)
     }
 
     val itemUiState = repository.getAllItems()

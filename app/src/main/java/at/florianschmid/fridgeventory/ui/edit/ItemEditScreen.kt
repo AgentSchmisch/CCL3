@@ -31,9 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import at.florianschmid.fridgeventory.data.Item
-import at.florianschmid.fridgeventory.ui.AppViewModelProvider
 import at.florianschmid.fridgeventory.ui.add.convertMillisToDate
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -41,7 +41,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ItemEditScreen(
     modifier: Modifier = Modifier,
-    viewModel: ItemEditViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: ItemEditViewModel = hiltViewModel(),
     onSave: () -> Unit
 ) {
     val item = viewModel.editUiState.item

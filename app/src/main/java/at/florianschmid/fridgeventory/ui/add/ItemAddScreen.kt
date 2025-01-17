@@ -41,11 +41,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import at.florianschmid.fridgeventory.CameraActivity
 import at.florianschmid.fridgeventory.R
 import at.florianschmid.fridgeventory.data.Item
-import at.florianschmid.fridgeventory.ui.AppViewModelProvider
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -57,7 +57,7 @@ import at.florianschmid.fridgeventory.ui.theme.Typography
 @Composable
 fun ItemAddScreen(
     modifier: Modifier = Modifier,
-    viewModel: ItemAddViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: ItemAddViewModel = hiltViewModel(),
     onSave: () -> Unit,
 ) {
     val item = viewModel.addUiState.item

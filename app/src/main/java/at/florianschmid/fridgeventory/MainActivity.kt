@@ -13,8 +13,10 @@ import androidx.core.content.ContextCompat
 import android.Manifest
 import at.florianschmid.fridgeventory.ui.FridgeventoryApp
 import at.florianschmid.fridgeventory.ui.theme.FridgeventoryTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.Executors
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     var cameraExecutor = Executors.newSingleThreadExecutor()
 

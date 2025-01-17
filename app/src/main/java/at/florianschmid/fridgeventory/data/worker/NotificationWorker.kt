@@ -6,28 +6,19 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import at.florianschmid.fridgeventory.data.ItemRepository
-import at.florianschmid.fridgeventory.data.db.ItemDatabase.Companion.getDatabase
+import at.florianschmid.fridgeventory.data.db.ItemDatabase
+import javax.inject.Inject
 
-class ExpiryNotificationWorker(
-    context: Context,
-    workerParams: WorkerParameters
-) : CoroutineWorker(context, workerParams) {
-
+class ExpiryNotificationWorker @Inject constructor(
+    private val context: Context,
+    private val workerParams: WorkerParameters,
     private val repository: ItemRepository
-
-    init {
-        Log.i("Worker", "Worker created")
-        val database = getDatabase(context)
-
-        val itemDao = database.itemDao()
-
-        // Pass ItemDao to the repository
-        repository = ItemRepository(itemDao)
-    }
+) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         val _expiringItems = repository.findItemsExpiringSoon()

@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -33,12 +34,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ExpiringItemsUI(
     modifier: Modifier = Modifier,
-    itemsViewModel: ExpiringViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    recommendationViewModel: RecommendationViewModel = viewModel(),
+    itemsViewModel: ExpiringViewModel = hiltViewModel(),
+    recommendationViewModel: RecommendationViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val state by itemsViewModel.expiringItemsUiState.collectAsStateWithLifecycle()
-    val recipeRecommendations by recommendationViewModel.recommendationUiState.collectAsStateWithLifecycle()
 
     val recipeItems = remember { mutableStateListOf<Item>() }
 
@@ -54,18 +54,8 @@ fun ExpiringItemsUI(
 
         Spacer(Modifier.height(16.dp))
         CreateRecipeButton {
-            recommendationViewModel.fetchRecommendations(recipeItems)
+            onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
         }
-
-        // Display recommendations
-        if (recipeRecommendations.items.isNotEmpty()) {
-            LazyColumn {
-                itemsIndexed(recipeRecommendations.items) { _, recipe ->
-                    Text(recipe.title, style = Typography.bodyLarge)
-                }
-            }
-        }
-
     }
 }
 
@@ -156,14 +146,15 @@ fun checkBoxChanged(item: Item, recipeItems: SnapshotStateList<Item>) {
     }
 }
 
-suspend fun onCreateRecipeClick(recipeItems: List<Item>, recipeRecommendationsUiState: RecommendationUiState) {
+fun onCreateRecipeClick(recipeItems: List<Item>, recommendationsViewModel: RecommendationViewModel, navController: NavController) {
     // Simulate creating a recipe with selected items
     println("Creating recipe with: $recipeItems")
-    // call the remote service to get recipes
-    val recipeRecommendations = RemoteService().fetchRecipeRecommendations(recipeItems)
-    println(recipeRecommendations)
-    // write the result to the viewModel
-    recipeRecommendationsUiState.items = recipeRecommendations
+    recommendationsViewModel.fetchRecommendations(recipeItems)
+
+    navController.navigate(
+        Routes.RecipeRecommendations.route
+    )
+
 }
 
 @Composable

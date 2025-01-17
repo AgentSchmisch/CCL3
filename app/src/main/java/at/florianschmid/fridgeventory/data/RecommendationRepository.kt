@@ -6,8 +6,9 @@ import at.florianschmid.fridgeventory.data.db.RecommendationEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json.Default.parseToJsonElement
+import javax.inject.Inject
 
-class RecommendationRepository(private val recommendationDao: RecommendationDao) {
+class RecommendationRepository @Inject constructor(private val recommendationDao: RecommendationDao) {
 
     suspend fun findItemById(id: Int): Recipe {
         val item = recommendationDao.findItemById(id)

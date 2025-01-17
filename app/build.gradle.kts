@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.compose.compiler)
+
 }
 
 android {
@@ -72,6 +75,16 @@ dependencies {
     implementation ("androidx.camera:camera-lifecycle:$camera_ver")
     implementation ("androidx.camera:camera-view:$camera_ver")
     implementation ("androidx.camera:camera-camera2:$camera_ver")
+
+    // Dependency injection
+    val daggerVersion = "2.52"
+    //Dagger
+    ksp("com.google.dagger:dagger-compiler:$daggerVersion") // Dagger compiler
+    ksp ("com.google.dagger:hilt-compiler:$daggerVersion")   // Hilt compiler
+    implementation("com.google.dagger:hilt-android:$daggerVersion")
+    //hiltViewmodel
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
 
     implementation ("androidx.activity:activity-ktx:1.9.3")
 
