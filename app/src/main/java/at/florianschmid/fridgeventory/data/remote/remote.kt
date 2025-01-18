@@ -19,7 +19,7 @@ class RemoteService {
         suspendCancellableCoroutine { continuation ->
             val urlBuilder = HttpUrl.Builder()
                 .scheme("https")
-                .host("mock-6e4ab8419c094b0a89a8a0c68f460176.mock.insomnia.rest")
+                .host("mock-cfe60b19bc9a4ddaad1bb22b30daa6e7.mock.insomnia.rest")
                 .addPathSegment("recipes")
                 .addPathSegment("findByIngredients")
                 .apply {
@@ -39,15 +39,20 @@ class RemoteService {
                 override fun onResponse(call: Call, response: Response) {
                     response.use {
                         if (!response.isSuccessful) {
-                            if (continuation.isActive) continuation.resumeWithException(IOException("Unexpected code $response"))
+                            if (continuation.isActive) continuation.resumeWithException(
+                                IOException(
+                                    "Unexpected code $response"
+                                )
+                            )
                             return
                         }
                         try {
                             val responseString = response.body!!.string()
                             val jsonRecommendation = Json.parseToJsonElement(responseString)
-                            val recommendations = jsonRecommendation.jsonArray.map { recommendation ->
-                                RecipeRecommendation(recommendation)
-                            }
+                            val recommendations =
+                                jsonRecommendation.jsonArray.map { recommendation ->
+                                    RecipeRecommendation(recommendation)
+                                }
                             if (continuation.isActive) continuation.resume(recommendations)
                         } catch (e: Exception) {
                             if (continuation.isActive) continuation.resumeWithException(e)
@@ -58,11 +63,12 @@ class RemoteService {
         }
 
 
-    suspend fun fetchRecipeDetails(recipeId:Int) =
+    suspend fun fetchRecipeDetails(recipeId: Int, recipeName: String, recipeImage: String): Recipe =
         suspendCancellableCoroutine { continuation ->
             val urlBuilder = HttpUrl.Builder()
+                //https://mock-cfe60b19bc9a4ddaad1bb22b30daa6e7.mock.insomnia.rest/recipes/findByIngredients
                 .scheme("https")
-                .host("mock-6e4ab8419c094b0a89a8a0c68f460176.mock.insomnia.rest")
+                .host("mock-cfe60b19bc9a4ddaad1bb22b30daa6e7.mock.insomnia.rest")
                 .addPathSegment("recipes")
                 .addPathSegment(recipeId.toString())
                 .addPathSegment("analyzedInstructions")
@@ -79,16 +85,21 @@ class RemoteService {
                 override fun onResponse(call: Call, response: Response) {
                     response.use {
                         if (!response.isSuccessful) {
-                            if (continuation.isActive) continuation.resumeWithException(IOException("Unexpected code $response"))
+                            if (continuation.isActive) continuation.resumeWithException(
+                                IOException(
+                                    "Unexpected code $response"
+                                )
+                            )
                             return
                         }
                         try {
                             val responseString = response.body!!.string()
-                            val jsonRecipe = Json.parseToJsonElement(responseString)
-                            val recipeRecommendationRecommendations = jsonRecipe.jsonArray.map { recipe ->
-                                Recipe(recipe)
-                            }
-                            if (continuation.isActive) continuation.resume(recipeRecommendationRecommendations)
+                            val recipes: List<Recipe> = Json { ignoreUnknownKeys = true }.decodeFromString(responseString)
+                            val recipeDetail = recipes.first()
+                            recipeDetail.name = recipeName
+                            recipeDetail.imageUrl = recipeImage
+
+                            if (continuation.isActive) continuation.resume(recipeDetail)
                         } catch (e: Exception) {
                             if (continuation.isActive) continuation.resumeWithException(e)
                         }

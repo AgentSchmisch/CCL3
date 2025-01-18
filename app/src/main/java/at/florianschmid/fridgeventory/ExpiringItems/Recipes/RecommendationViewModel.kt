@@ -19,6 +19,10 @@ data class RecipeUiState(
     var recipe: Recipe? = null
 )
 
+data class RecipeStepUiState(
+    var step: Int = 0
+)
+
 @HiltViewModel
 class RecommendationViewModel @Inject constructor(private val remoteService: RemoteService, private val recipeService: RecipeService) : ViewModel() {
 
@@ -36,4 +40,27 @@ class RecommendationViewModel @Inject constructor(private val remoteService: Rem
     }
 }
 
+@HiltViewModel
+class RecipeViewModel @Inject constructor(private val remoteService: RemoteService, private val recipeService: RecipeService) : ViewModel() {
 
+    val recipe = recipeService.recipe
+    val recipeStep = recipeService.recipeStep
+
+    fun fetchRecipe(recipeId: Int, recipeName: String, recipeImage: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val recipe = remoteService.fetchRecipeDetails(recipeId, recipeName, recipeImage)
+                recipeService.setRecipe(recipe)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun incrementRecipeStep(){
+        recipeService.incrementRecipeStep()
+    }
+    fun decrementRecipeStep(){
+        recipeService.decrementRecipeStep()
+    }
+}

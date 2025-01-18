@@ -8,15 +8,4 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class MainApplication : Application() {
 
-/*    val itemRepository by lazy {
-        ItemRepository(
-            ItemDatabase.getDatabase(this).itemDao()
-        )
-    }
-    val recommendationRepository by lazy{
-        RecommendationRepository(
-            ItemDatabase.getDatabase(this).recommendationDao()
-        )
-    }*/
-
 }

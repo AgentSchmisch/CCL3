@@ -1,6 +1,5 @@
 package at.florianschmid.fridgeventory.ExpiringItems.Recipes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,46 +19,52 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import at.florianschmid.fridgeventory.R
+import androidx.navigation.NavController
 import at.florianschmid.fridgeventory.data.RecipeRecommendation
+import at.florianschmid.fridgeventory.ui.Routes
 import coil3.compose.AsyncImage
-import kotlinx.serialization.json.Json.Default.parseToJsonElement
 
 
 @Composable
-fun RecipeUI(
+fun RecommendationUI(
     modifier: Modifier = Modifier,
     onClose: () -> Unit,
-    recommendationViewModel: RecommendationViewModel = hiltViewModel()
+    recommendationViewModel: RecommendationViewModel = hiltViewModel(),
+    recipeViewModel: RecipeViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val state by recommendationViewModel.recommendations.collectAsStateWithLifecycle()
 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text("Recipes")
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier.height(16.dp))
 
         LazyColumn {
             itemsIndexed(state.items) { _, recipe ->
-                RecommendationCard(recipe)
+                RecommendationCard(recipe, recipeViewModel, navController = navController)
             }
         }
     }
-
 }
 
 
 @Composable
-fun RecommendationCard(recipeRecommendation: RecipeRecommendation, modifier: Modifier = Modifier) {
+fun RecommendationCard (recipeRecommendation: RecipeRecommendation, recipeViewModel: RecipeViewModel, modifier: Modifier = Modifier, navController:NavController) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp) // Add padding around the card
+            .padding(8.dp),
+        onClick = {
+            onRecipeCardClick(
+                recipeRecommendation = recipeRecommendation,
+                navController = navController,
+                recipeViewModel = recipeViewModel
+            )
+        }
     ) {
         Row(
             modifier = Modifier.padding(8.dp), // Padding inside the Row
@@ -79,7 +84,7 @@ fun RecommendationCard(recipeRecommendation: RecipeRecommendation, modifier: Mod
             ) {
                 // Title
                 Text(
-                    text = recipeRecommendation.title,
+                    text = recipeRecommendation.name,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(8.dp)
 
@@ -117,29 +122,22 @@ fun RecommendationCard(recipeRecommendation: RecipeRecommendation, modifier: Mod
 }
 
 
+fun onRecipeCardClick(recipeRecommendation: RecipeRecommendation, navController: NavController, recipeViewModel: RecipeViewModel) {
+
+    recipeViewModel.fetchRecipe(recipeRecommendation.id, recipeRecommendation.name, recipeRecommendation.image)
+
+    navController.navigate(
+        Routes.RecipeDetail.route.replace("{recipeId}", "${recipeRecommendation.id}")
+    )
+}
+
+
 @Composable
 fun ImageDisplay(recipeRecommendation: RecipeRecommendation) {
-
     AsyncImage(
         model = recipeRecommendation.image,
-        contentDescription = "Image of ${recipeRecommendation.title}",
-    )
-
-
-
-
-    Image(
-        painter = painterResource(id = R.mipmap.recipe_foreground),
-        contentDescription = "Apple",
-        modifier = Modifier
+        contentDescription = "Image of ${recipeRecommendation.name}",
     )
 }
 
 
-@Composable
-@Preview
-fun RecommendationPreview() {
-    val recipeRecommendation =
-        RecipeRecommendation(parseToJsonElement("{\"id\": 1, \"title\": \"Easy Homemade Apple Fritters\", \"image\": \"https://img.spoonacular.com/recipes/673463-312x231.jpg\", \"usedIngredientCount\": 1, \"missedIngredientCount\": 1, \"missedIngredients\": [], \"usedIngredients\": [], \"unusedIngredients\": [], \"likes\": 1}"))
-    RecommendationCard(recipeRecommendation)
-}

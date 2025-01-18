@@ -35,7 +35,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideItemRepository(itemDao: ItemDao):ItemRepository{
+    fun provideItemRepository(itemDao: ItemDao): ItemRepository{
         return ItemRepository(itemDao)
     }
 

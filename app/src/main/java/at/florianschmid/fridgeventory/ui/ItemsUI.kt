@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -55,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import at.florianschmid.fridgeventory.ExpiringItems.ExpiringItemsUI
 import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecipeUI
+import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecommendationUI
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.add.ItemAddScreen
 import at.florianschmid.fridgeventory.ui.edit.ItemEditScreen
@@ -73,7 +73,6 @@ enum class Routes(val route: String) {
     Edit("fridgeventory/details/{itemId}/edit"),
     Add("fridgeventory/new"),
     Expiring("fridgeventory/expiring"),
-    RecipeHome("fridgeventory/recipes"),
     RecipeRecommendations("fridgeventory/recipes/recommendations"),
     RecipeDetail("fridgeventory/recipes/{recipeId}")
 
@@ -118,7 +117,9 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
                 ItemAddScreen(
                     onSave = {
                         navController.navigateUp()
-                    }
+                    },
+                    modifier = Modifier.padding(innerPadding)
+
                 )
             }
 
@@ -135,20 +136,30 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
 
             composable(
                 route = Routes.Expiring.route
-            ){
-                ExpiringItemsUI(navController = navController)
+            ) {
+                ExpiringItemsUI(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
 
             composable(
-                route = Routes.RecipeHome.route
+                route = Routes.RecipeDetail.route,
+                arguments = listOf(navArgument("recipeId") {
+                    type = NavType.IntType
+                })
             ) {
                 RecipeUI(
-                    onClose = { navController.navigateUp() }
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+
                 )
             }
             composable(route = Routes.RecipeRecommendations.route) {
-                RecipeUI(
-                    onClose = { navController.navigateUp() }
+                RecommendationUI(
+                    navController = navController,
+                    onClose = { navController.navigateUp() },
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
         }
@@ -168,7 +179,12 @@ fun ItemsHomeScreen(
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Title at the top
-            Text("Fridgeventory", style=Typography.titleLarge, modifier = Modifier.padding(16.dp), color = colorResource(R.color.f_dark_purple))
+            Text(
+                "Fridgeventory",
+                style = Typography.titleLarge,
+                modifier = Modifier.padding(16.dp),
+                color = colorResource(R.color.f_dark_purple)
+            )
 
             LazyColumn(
                 modifier = Modifier
@@ -188,8 +204,6 @@ fun ItemsHomeScreen(
         AddItemButton(onAddClick)
     }
 }
-
-
 
 
 @Composable
@@ -290,7 +304,13 @@ fun FridgeListItem(
                     .align(Alignment.BottomEnd) // Align to bottom-right
                     .padding(16.dp)
             ) {
-                IconButton(onClick = { changeQuantity(item = item, change = -1, viewModel=viewModel) }) {
+                IconButton(onClick = {
+                    changeQuantity(
+                        item = item,
+                        change = -1,
+                        viewModel = viewModel
+                    )
+                }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowDown,
                         contentDescription = "Decrease",
@@ -304,7 +324,7 @@ fun FridgeListItem(
                     style = androidx.compose.ui.text.TextStyle(fontSize = 18.sp)
                 )
 
-                IconButton(onClick = { changeQuantity(item, 1, viewModel=viewModel) }) {
+                IconButton(onClick = { changeQuantity(item, 1, viewModel = viewModel) }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
                         contentDescription = "Increase",
@@ -344,9 +364,11 @@ fun LocalImageDisplay(item: Item) {
 }
 
 
-
 @Composable
-fun ItemsDetailsScreen(modifier: Modifier = Modifier, itemUpdateViewModel: ItemUpdateViewModel = hiltViewModel()) {
+fun ItemsDetailsScreen(
+    modifier: Modifier = Modifier,
+    itemUpdateViewModel: ItemUpdateViewModel = hiltViewModel()
+) {
     val detailUiState by itemUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
     ItemDetails(detailUiState.item, modifier)
 }
@@ -364,7 +386,11 @@ fun ItemDetails(item: Item, modifier: Modifier = Modifier) {
             Column {
                 Text("Description: ${item.additional}", style = Typography.headlineSmall)
                 Spacer(Modifier.width(20.dp))
-                Text("Expiry Date: ${DateTimeFormatter.ofPattern("dd.MM.yyyy").format(item.expiry_date)}", style = Typography.headlineSmall)
+                Text(
+                    "Expiry Date: ${
+                        DateTimeFormatter.ofPattern("dd.MM.yyyy").format(item.expiry_date)
+                    }", style = Typography.headlineSmall
+                )
             }
         }
     }
@@ -401,18 +427,17 @@ fun Footer(navController: NavController) {
         )
 
         NavigationBarItem(
-            onClick = { navController.navigate(Routes.RecipeHome.route) },
+            onClick = { navController.navigate(Routes.RecipeRecommendations.route) },
             icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_soup_kitchen_24),
                     contentDescription = "Recipes"
                 )
             },
-            selected = currentScreen == Routes.RecipeHome
+            selected = currentScreen == Routes.RecipeRecommendations || currentScreen == Routes.RecipeDetail
         )
     }
 }
-
 
 
 @Composable
