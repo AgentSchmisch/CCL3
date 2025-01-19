@@ -83,28 +83,21 @@ enum class Routes(val route: String) {
 fun FridgeventoryApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     Scaffold(modifier = Modifier.fillMaxSize(),
-        bottomBar = { Footer(navController) }
-    ) { innerPadding ->
+        bottomBar = { Footer(navController) }) { innerPadding ->
 
         NavHost(
-            navController = navController,
-            startDestination = Routes.Home.route,
-            modifier = modifier
+            navController = navController, startDestination = Routes.Home.route, modifier = modifier
         ) {
             composable(Routes.Home.route) {
-                ItemsHomeScreen(
-                    onEditClick = {
-                        navController.navigate(Routes.Edit.route.replace("{itemId}", "$it"))
-                    },
-                    onAddClick = {
-                        navController.navigate(Routes.Add.route) // Navigate to Add route
-                    },
-                    modifier = Modifier.padding(innerPadding)
+                ItemsHomeScreen(onEditClick = {
+                    navController.navigate(Routes.Edit.route.replace("{itemId}", "$it"))
+                }, onAddClick = {
+                    navController.navigate(Routes.Add.route) // Navigate to Add route
+                }, modifier = Modifier.padding(innerPadding)
                 )
             }
             composable(
-                route = Routes.Detail.route,
-                arguments = listOf(navArgument("itemId") {
+                route = Routes.Detail.route, arguments = listOf(navArgument("itemId") {
                     type = NavType.IntType
                 })
             ) {
@@ -117,15 +110,13 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
                 ItemAddScreen(
                     onSave = {
                         navController.navigateUp()
-                    },
-                    modifier = Modifier.padding(innerPadding)
+                    }, modifier = Modifier.padding(innerPadding)
 
                 )
             }
 
             composable(
-                route = Routes.Edit.route,
-                arguments = listOf(navArgument("itemId") {
+                route = Routes.Edit.route, arguments = listOf(navArgument("itemId") {
                     type = NavType.IntType
                 })
             ) {
@@ -138,20 +129,17 @@ fun FridgeventoryApp(modifier: Modifier = Modifier) {
                 route = Routes.Expiring.route
             ) {
                 ExpiringItemsUI(
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                    navController = navController, modifier = Modifier.padding(innerPadding)
                 )
             }
 
             composable(
-                route = Routes.RecipeDetail.route,
-                arguments = listOf(navArgument("recipeId") {
+                route = Routes.RecipeDetail.route, arguments = listOf(navArgument("recipeId") {
                     type = NavType.IntType
                 })
             ) {
                 RecipeUI(
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                    navController = navController, modifier = Modifier.padding(innerPadding)
 
                 )
             }
@@ -187,14 +175,11 @@ fun ItemsHomeScreen(
             )
 
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(state.items) { _, item ->
                     FridgeListItem(
-                        item,
-                        onEditClick = { onEditClick(item.id) },
-                        viewModel = itemViewModel
+                        item, onEditClick = { onEditClick(item.id) }, viewModel = itemViewModel
                     )
                 }
             }
@@ -209,8 +194,7 @@ fun ItemsHomeScreen(
 @Composable
 fun AddItemButton(onAddClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         // Floating Surface (Add Button) at the bottom-right corner
         Surface(
@@ -242,14 +226,10 @@ fun AddItemButton(onAddClick: () -> Unit) {
 
 @Composable
 fun FridgeListItem(
-    item: Item,
-    onEditClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: ItemViewModel
+    item: Item, onEditClick: () -> Unit, modifier: Modifier = Modifier, viewModel: ItemViewModel
 ) {
     Card(
-        onClick = { onEditClick() },
-        modifier = modifier
+        onClick = { onEditClick() }, modifier = modifier
             .fillMaxWidth() // Card takes full width
             .height(240.dp) // Adjust height as needed
             .padding(8.dp), // Add padding around the card
@@ -257,8 +237,7 @@ fun FridgeListItem(
         shape = RoundedCornerShape(16.dp) // Optional: Rounded corners
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize() // Box stretches to fill the card
+            modifier = Modifier.fillMaxSize() // Box stretches to fill the card
         ) {
             // Background Image that completely fills the card
             LocalImageDisplay(item)
@@ -273,9 +252,7 @@ fun FridgeListItem(
             ) {
                 // Title (Item Name)
                 Text(
-                    text = item.name,
-                    style = Typography.headlineMedium,
-                    color = Color.White
+                    text = item.name, style = Typography.headlineMedium, color = Color.White
                 )
 
                 // Date and Timer Icon Row
@@ -306,9 +283,7 @@ fun FridgeListItem(
             ) {
                 IconButton(onClick = {
                     changeQuantity(
-                        item = item,
-                        change = -1,
-                        viewModel = viewModel
+                        item = item, change = -1, viewModel = viewModel
                     )
                 }) {
                     Icon(
@@ -338,9 +313,7 @@ fun FridgeListItem(
 
 
 fun changeQuantity(
-    item: Item,
-    change: Int,
-    viewModel: ItemViewModel
+    item: Item, change: Int, viewModel: ItemViewModel
 ) {
     // Call ViewModel to handle quantity change
     if (change > 0) {
@@ -353,9 +326,7 @@ fun changeQuantity(
 @Composable
 fun LocalImageDisplay(item: Item) {
     AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(item.image_path)
-            .crossfade(true)
+        model = ImageRequest.Builder(LocalContext.current).data(item.image_path).crossfade(true)
             .build(),
         placeholder = painterResource(R.drawable.apple_background),
         contentDescription = "Image of ${item.name}",
@@ -366,8 +337,7 @@ fun LocalImageDisplay(item: Item) {
 
 @Composable
 fun ItemsDetailsScreen(
-    modifier: Modifier = Modifier,
-    itemUpdateViewModel: ItemUpdateViewModel = hiltViewModel()
+    modifier: Modifier = Modifier, itemUpdateViewModel: ItemUpdateViewModel = hiltViewModel()
 ) {
     val detailUiState by itemUpdateViewModel.detailUiState.collectAsStateWithLifecycle()
     ItemDetails(detailUiState.item, modifier)
@@ -404,30 +374,23 @@ fun Footer(navController: NavController) {
     NavigationBar(
         containerColor = colorResource(R.color.f_dark_purple)
     ) {
-        NavigationBarItem(
-            onClick = { navController.navigate(Routes.Home.route) },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_home_24),
-                    contentDescription = "Home"
-                )
-            },
-            selected = currentScreen == Routes.Home
+        NavigationBarItem(onClick = { navController.navigate(Routes.Home.route) }, icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_home_24),
+                contentDescription = "Home"
+            )
+        }, selected = currentScreen == Routes.Home
         )
 
-        NavigationBarItem(
-            onClick = { navController.navigate(Routes.Expiring.route) },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_access_time_24),
-                    contentDescription = "Expiring Items"
-                )
-            },
-            selected = currentScreen == Routes.Expiring
+        NavigationBarItem(onClick = { navController.navigate(Routes.Expiring.route) }, icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_access_time_24),
+                contentDescription = "Expiring Items"
+            )
+        }, selected = currentScreen == Routes.Expiring
         )
 
-        NavigationBarItem(
-            onClick = { navController.navigate(Routes.RecipeRecommendations.route) },
+        NavigationBarItem(onClick = { navController.navigate(Routes.RecipeRecommendations.route) },
             icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_soup_kitchen_24),

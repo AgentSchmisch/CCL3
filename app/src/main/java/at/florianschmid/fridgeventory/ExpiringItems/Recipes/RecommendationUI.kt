@@ -2,6 +2,7 @@ package at.florianschmid.fridgeventory.ExpiringItems.Recipes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,9 +54,12 @@ fun RecommendationUI(
     val recipe by recipeViewModel.recipe.collectAsStateWithLifecycle()
 
     if (state.items == null || state.items.isEmpty()) {
-        Column(modifier = modifier) {
+        Column(
+            modifier = modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        NotFound()
+            NotFound()
             Button(onClick = {
                 navController.navigate(Routes.Expiring.route)
             }) {
@@ -64,17 +68,27 @@ fun RecommendationUI(
         }
 
     } else {
-        Text(
-            "Recommended Recipes",
-            style = Typography.titleLarge,
-            modifier = Modifier.padding(16.dp),
-            color = colorResource(R.color.f_dark_purple)
-        )
+        Box(modifier = modifier.fillMaxSize()) {
 
-        Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-            LazyColumn {
-                itemsIndexed(state.items) { _, recipe ->
-                    RecommendationCard(recipe, recipeViewModel, navController = navController)
+            Column(modifier = Modifier.fillMaxSize()) {
+
+                Text(
+                    "Recommended Recipes",
+                    modifier = Modifier.padding(16.dp),
+                    style = Typography.titleLarge,
+                    color = colorResource(R.color.f_dark_purple)
+                )
+
+                Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    LazyColumn {
+                        itemsIndexed(state.items) { _, recipe ->
+                            RecommendationCard(
+                                recipe,
+                                recipeViewModel,
+                                navController = navController
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -84,7 +98,7 @@ fun RecommendationUI(
 @Composable
 fun NotFound() {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -174,7 +188,6 @@ fun RecommendationCard(
         }
     }
 }
-
 
 
 fun onRecipeCardClick(

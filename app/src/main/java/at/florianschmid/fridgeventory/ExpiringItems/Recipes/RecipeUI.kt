@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,7 +62,7 @@ fun RecipeUI(
 
 @Composable
 fun RecipeDisplay(recipe: Recipe, recipeStep: Int, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
 
         Text(
             "${recipe.name}",
@@ -82,7 +84,14 @@ fun RecipeDisplay(recipe: Recipe, recipeStep: Int, modifier: Modifier = Modifier
         } else {
             RecipeFinishedDisplay()
         }
-        RecipeStepNavigator(currentStep = recipeStep, steps = recipe.steps.size)
+        Spacer(modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RecipeStepNavigator(currentStep = recipeStep, steps = recipe.steps.size)
+        }
     }
 }
 
@@ -187,7 +196,7 @@ fun RecipeStepNavigator(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         IconButton(
             onClick = {
@@ -202,10 +211,11 @@ fun RecipeStepNavigator(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Next Step",
+                contentDescription = "Previous Step"
             )
         }
 
+        // Next Step Button
         IconButton(
             onClick = {
                 if (currentStep <= steps) {
@@ -222,8 +232,6 @@ fun RecipeStepNavigator(
                 contentDescription = "Next Step"
             )
         }
-
-
     }
 }
 

@@ -10,7 +10,7 @@ data class ItemEntity(
     val _id: Int = 0,
     val name: String,
     val expiry_date:  LocalDateTime,
-    var quantity: Int,
+    var quantity: Int = 0,
     val additional: String,
     val image_path: String
 )

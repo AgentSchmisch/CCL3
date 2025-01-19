@@ -44,24 +44,30 @@ fun ExpiringItemsUI(
             NotFound()
         }
     } else {
-        Text(
-            "Expiring Items",
-            style = Typography.titleLarge,
-            modifier = Modifier.padding(16.dp),
-            color = colorResource(R.color.f_dark_purple)
-        )
-        Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(Modifier.height(16.dp))
+        Box(modifier = modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    "Expiring Items",
+                    style = Typography.titleLarge,
+                    modifier = Modifier.padding(16.dp),
+                    color = colorResource(R.color.f_dark_purple)
+                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-            LazyColumn {
-                itemsIndexed(state.items) { _, item ->
-                    ItemCard(item = item, recipeItems = recipeItems)
+                    LazyColumn {
+                        itemsIndexed(state.items) { _, item ->
+                            ItemCard(item = item, recipeItems = recipeItems)
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+                    CreateRecipeButton {
+                        onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
+                    }
                 }
-            }
-
-            Spacer(Modifier.height(16.dp))
-            CreateRecipeButton {
-                onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
             }
         }
     }

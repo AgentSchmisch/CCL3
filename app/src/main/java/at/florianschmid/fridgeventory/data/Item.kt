@@ -6,7 +6,7 @@ data class Item(
     val id: Int,
     val name: String,
     val expiry_date: LocalDateTime = LocalDateTime.now(),
-    var quantity: Int,
+    var quantity: Int = 0,
     val additional: String,
     var image_path: String,
     var checkedForRecipe: Boolean = false
