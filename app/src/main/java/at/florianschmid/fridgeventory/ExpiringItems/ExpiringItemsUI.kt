@@ -18,14 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecommendationUiState
 import at.florianschmid.fridgeventory.ExpiringItems.Recipes.RecommendationViewModel
 import at.florianschmid.fridgeventory.ui.theme.Typography
 import at.florianschmid.fridgeventory.R
 import at.florianschmid.fridgeventory.data.Item
-import at.florianschmid.fridgeventory.data.remote.RemoteService
 import at.florianschmid.fridgeventory.ui.LocalImageDisplay
 import at.florianschmid.fridgeventory.ui.Routes
 import java.time.LocalDateTime
@@ -42,22 +39,47 @@ fun ExpiringItemsUI(
 
     val recipeItems = remember { mutableStateListOf<Item>() }
 
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Expiring Items", style = Typography.titleLarge)
-        Spacer(Modifier.height(16.dp))
-
-        LazyColumn {
-            itemsIndexed(state.items) { _, item ->
-                ItemCard(item = item, recipeItems = recipeItems)
-            }
+    if (state.items == null || state.items.isEmpty()) {
+        Column {
+            NotFound()
         }
+    } else {
+        Text(
+            "Expiring Items",
+            style = Typography.titleLarge,
+            modifier = Modifier.padding(16.dp),
+            color = colorResource(R.color.f_dark_purple)
+        )
+        Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(Modifier.height(16.dp))
 
-        Spacer(Modifier.height(16.dp))
-        CreateRecipeButton {
-            onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
+            LazyColumn {
+                itemsIndexed(state.items) { _, item ->
+                    ItemCard(item = item, recipeItems = recipeItems)
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            CreateRecipeButton {
+                onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
+            }
         }
     }
 }
+
+@Composable
+fun NotFound() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "No items found", style = Typography.titleMedium, color = Color.Gray
+        )
+    }
+}
+
 
 @Composable
 fun CreateRecipeButton(onClick: () -> Unit) {
@@ -90,9 +112,7 @@ fun ItemCard(item: Item, recipeItems: SnapshotStateList<Item>, modifier: Modifie
                     .padding(16.dp)
             ) {
                 Text(
-                    text = item.name,
-                    style = Typography.headlineMedium,
-                    color = Color.White
+                    text = item.name, style = Typography.headlineMedium, color = Color.White
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -125,12 +145,10 @@ fun ItemCard(item: Item, recipeItems: SnapshotStateList<Item>, modifier: Modifie
                     style = androidx.compose.ui.text.TextStyle(fontSize = 18.sp)
                 )
                 Checkbox(
-                    checked = isChecked.value,
-                    onCheckedChange = { checked ->
+                    checked = isChecked.value, onCheckedChange = { checked ->
                         isChecked.value = checked
                         checkBoxChanged(item, recipeItems)
-                    },
-                    colors = CheckboxDefaults.colors(checkmarkColor = Color.White)
+                    }, colors = CheckboxDefaults.colors(checkmarkColor = Color.White)
                 )
             }
         }
@@ -146,7 +164,11 @@ fun checkBoxChanged(item: Item, recipeItems: SnapshotStateList<Item>) {
     }
 }
 
-fun onCreateRecipeClick(recipeItems: List<Item>, recommendationsViewModel: RecommendationViewModel, navController: NavController) {
+fun onCreateRecipeClick(
+    recipeItems: List<Item>,
+    recommendationsViewModel: RecommendationViewModel,
+    navController: NavController
+) {
     // Simulate creating a recipe with selected items
     println("Creating recipe with: $recipeItems")
     recommendationsViewModel.fetchRecommendations(recipeItems)
