@@ -21,9 +21,6 @@ import javax.inject.Inject
 class ItemViewModel @Inject constructor(private val repository: ItemRepository, private val workManager: WorkManager, private val workRequest: WorkRequest) : ViewModel() {
 
     init {
-        viewModelScope.launch {
-            repository.getAllItems()
-        }
         enqueueExpiryNotificationWorker()
     }
 

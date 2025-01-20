@@ -19,7 +19,7 @@ class RemoteService {
         suspendCancellableCoroutine { continuation ->
             val urlBuilder = HttpUrl.Builder()
                 .scheme("https")
-                .host("mock-cfe60b19bc9a4ddaad1bb22b30daa6e7.mock.insomnia.rest")
+                .host("api.spoonacular.com")
                 .addPathSegment("recipes")
                 .addPathSegment("findByIngredients")
                 .apply {
@@ -68,10 +68,13 @@ class RemoteService {
             val urlBuilder = HttpUrl.Builder()
                 //https://mock-cfe60b19bc9a4ddaad1bb22b30daa6e7.mock.insomnia.rest/recipes/findByIngredients
                 .scheme("https")
-                .host("mock-cfe60b19bc9a4ddaad1bb22b30daa6e7.mock.insomnia.rest")
+                .host("api.spoonacular.com")
                 .addPathSegment("recipes")
                 .addPathSegment(recipeId.toString())
                 .addPathSegment("analyzedInstructions")
+                .apply {
+                    addQueryParameter("apiKey", "88043b90495647d2bb44a84e05e0eb78")
+                }
 
             val request = Request.Builder()
                 .url(urlBuilder.build())

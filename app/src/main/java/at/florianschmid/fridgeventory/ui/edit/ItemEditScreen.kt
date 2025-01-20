@@ -1,6 +1,12 @@
 package at.florianschmid.fridgeventory.ui.edit
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
@@ -19,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -29,12 +37,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import at.florianschmid.fridgeventory.R
 import at.florianschmid.fridgeventory.data.Item
 import at.florianschmid.fridgeventory.ui.add.convertMillisToDate
+import at.florianschmid.fridgeventory.ui.add.startCamera
+import at.florianschmid.fridgeventory.ui.theme.Typography
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -67,79 +82,170 @@ fun ItemEditForm(
         convertMillisToDate(it)
     } ?: item.expiry_date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
 
-    OutlinedCard(
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = colorResource(R.color.f_dark_purple),
+        unfocusedTextColor = colorResource(R.color.f_dark_purple),
+        disabledTextColor = colorResource(R.color.f_dark_purple),
+        focusedBorderColor = colorResource(R.color.f_dark_purple),
+        unfocusedBorderColor = colorResource(R.color.f_dark_purple),
+    )
+
+    // Registering the activity result for camera
+    val resultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val imageUri = data?.getStringExtra("image_uri")
+
+            if (imageUri != null) {
+                // Update the image path in the ViewModel
+                item.image_path = imageUri
+            }
+        }
+    }
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
-    )
-    {
-        Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Row {
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)) // Change background color
+
+    ) {
+        Column(
+            Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center, // Centers the items in the Row
+                modifier = Modifier.fillMaxWidth() // Ensures the Row fills the available width
+            ) {
+                Text(
+                    "Add a new item to your fridge",
+                    style = Typography.titleLarge,
+                    color = colorResource(R.color.f_dark_purple)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = item.name,
-                    label = { Text("Name") },
+                    label = { Text("Name", color = colorResource(R.color.f_dark_purple)) },
+                    colors = textFieldColors,
                     onValueChange = { newText ->
                         onValueChange(item.copy(name = newText))
                     })
             }
-            Row {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = item.additional,
-                    label = { Text("Description") },
+                    label = { Text("Description", color = colorResource(R.color.f_dark_purple)) },
+                    colors = textFieldColors,
                     onValueChange = { newText ->
                         onValueChange(item.copy(additional = newText))
                     })
             }
-            Row {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = item.quantity.toString(),
+                    onValueChange = { newNumber ->
+                        val parsedQuantity = newNumber.toIntOrNull() ?: 0
+                        onValueChange(item.copy(quantity = parsedQuantity))
+                    },
+                    colors = textFieldColors,
+                    label = { Text("Amount", color = colorResource(R.color.f_dark_purple)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // the modal for datetime selection is shown here
                 OutlinedTextField(
                     value = selectedDate,
-                    label = { Text("Expiry Date") },
+                    label = { Text("Expiry Date", color = colorResource(R.color.f_dark_purple)) },
                     readOnly = true,
+                    colors = textFieldColors,
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = !showDatePicker }) {
                             Icon(
                                 imageVector = Icons.Default.DateRange,
-                                contentDescription = "Select date"
+                                contentDescription = "Select date",
+                                tint = colorResource(R.color.f_dark_purple)
                             )
                         }
                     },
-                    onValueChange = {  }
+                    onValueChange = { }
                 )
                 if (showDatePicker) {
                     Popup(
                         onDismissRequest = { showDatePicker = false },
-                        alignment = Alignment.TopStart
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(y = 64.dp)
                                 .shadow(elevation = 4.dp)
                                 .background(MaterialTheme.colorScheme.surface)
                                 .padding(16.dp)
                         ) {
-                            DatePicker(
-                                state = datePickerState,
-                                showModeToggle = false
-                            )
+                            Column {
+                                DatePicker(
+                                    state = datePickerState,
+                                    showModeToggle = false,
+                                )
+                                Button(onClick = {
+                                    showDatePicker = false
+                                }) {
+                                    Text("Select")
+                                }
+                            }
                         }
                     }
                 }
+                CameraButton(resultLauncher)
             }
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = {
-                // set the expiry date to the selected date
-                onValueChange(
-                    item.copy(
-                        // set the date to the start of the day
-                        expiry_date = LocalDate.parse(selectedDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                            .atStartOfDay()
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(onClick = {
+                    // set the expiry date to the selected date
+                    onValueChange(
+                        item.copy(
+                            // set the date to the start of the day
+                            expiry_date = LocalDate.parse(
+                                selectedDate,
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                            ).atStartOfDay()
+                        )
                     )
-                )
-                onSaveButtonClicked()
-            })
-            {
-                Text("Save Changes")
+                    onSaveButtonClicked()
+                })
+                {
+                    Text("Update my Fridge")
+                }
             }
         }
+    }
+}
+
+@Composable
+fun CameraButton(resultLauncher: ActivityResultLauncher<Intent>) {
+    val context = LocalContext.current
+    IconButton(onClick = { startCamera(context, resultLauncher) }) {
+        Icon(
+            painter = painterResource(R.drawable.baseline_camera_alt_24),
+            contentDescription = "Take Picture",
+            tint = colorResource(R.color.f_dark_purple)
+        )
     }
 }
