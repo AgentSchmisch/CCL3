@@ -103,13 +103,13 @@ fun NotFound() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.notfound_foreground),
+            painter = painterResource(id = R.drawable.notfound),
             contentDescription = "Not found",
             modifier = Modifier.size(500.dp)
         )
         Text(
             text = "You haven't generated any recipes yet\nGo to expiring Items to generate them",
-            style = Typography.titleLarge,
+            style = Typography.titleMedium,
             modifier = Modifier.padding(8.dp),
             color = colorResource(R.color.f_dark_purple)
         )
@@ -201,6 +201,7 @@ fun onRecipeCardClick(
         recipeRecommendation.name,
         recipeRecommendation.image
     )
+    recipeViewModel.resetRecipeStep()
 
     navController.navigate(
         Routes.RecipeDetail.route.replace("{recipeId}", "${recipeRecommendation.id}")

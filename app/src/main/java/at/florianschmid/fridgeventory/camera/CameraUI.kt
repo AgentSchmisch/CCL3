@@ -110,6 +110,7 @@ private fun takeImage(context: Context, imageCapture: ImageCapture) {
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                Toast.makeText(context, "Image captured successfully.", Toast.LENGTH_SHORT).show()
                 val resultIntent = Intent().apply {
                     putExtra("image_uri", outputFileResults.savedUri.toString())
                 }

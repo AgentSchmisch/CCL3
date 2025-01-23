@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -48,6 +50,7 @@ fun RecipeUI(
     val state by recipeViewModel.recipe.collectAsStateWithLifecycle()
     val recipeStep = recipeViewModel.recipeStep.collectAsState()
 
+
     val recipe = state.recipe
 
     Column(modifier) {
@@ -62,7 +65,11 @@ fun RecipeUI(
 
 @Composable
 fun RecipeDisplay(recipe: Recipe, recipeStep: Int, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
 
         Text(
             "${recipe.name}",
@@ -139,15 +146,18 @@ fun IngredientDisplay(recipe: Recipe) {
                 modifier = Modifier.padding(16.dp),
                 color = colorResource(R.color.f_dark_purple)
             )
-            recipe.steps.forEach { it ->
-                it.ingredients?.forEach {
+            LazyColumn {
+                // Flatten the list of ingredients from all steps
+                val ingredientsList = recipe.steps.flatMap { it.ingredients ?: emptyList() }
+                itemsIndexed(ingredientsList) { _,ingredient ->
                     Text(
-                        it.name,
+                        ingredient.name,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
                         color = colorResource(R.color.f_dark_purple)
                     )
                 }
             }
+
         }
     }
 }
@@ -286,6 +296,66 @@ val mockRecipe = Recipe(
                     id = 20081,
                     image = "flour.png",
                     name = "all purpose flour"
+                ),
+                Ingredient(
+                    id = 1123,
+                    image = "egg.jpg",
+                    name = "egg"
+                ),
+                Ingredient(
+                    id = 2047,
+                    image = "salt.jpg",
+                    name = "salt"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
+                ),
+                Ingredient(
+                    id = 18371,
+                    image = "baking-powder.jpg",
+                    name = "baking powder"
                 )
             ),
             number = 1,
