@@ -21,6 +21,12 @@ class RecipeService {
         }
     }
 
+    fun resetRecipeStep(){
+        _recipeStep.update {
+            it.copy(step = 0)
+        }
+    }
+
     fun setRecipe(recipe: Recipe) {
         _recipe.update {
             it.copy(recipe = recipe)

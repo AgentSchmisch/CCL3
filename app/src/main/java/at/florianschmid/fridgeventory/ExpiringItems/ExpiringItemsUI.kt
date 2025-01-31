@@ -45,28 +45,39 @@ fun ExpiringItemsUI(
         }
     } else {
         Box(modifier = modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    "Expiring Items",
-                    style = Typography.titleLarge,
-                    modifier = Modifier.padding(16.dp),
-                    color = colorResource(R.color.f_dark_purple)
-                )
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Header item
+                item {
+                    Text(
+                        "Expiring Items",
+                        style = Typography.titleLarge,
+                        modifier = Modifier.padding(16.dp),
+                        color = colorResource(R.color.f_dark_purple)
+                    )
+                }
 
-                    LazyColumn {
-                        itemsIndexed(state.items) { _, item ->
-                            ItemCard(item = item, recipeItems = recipeItems)
-                        }
-                    }
+                // List of items
+                itemsIndexed(state.items) { _, item ->
+                    ItemCard(item = item, recipeItems = recipeItems)
+                }
 
-                    Spacer(Modifier.height(16.dp))
-                    CreateRecipeButton {
-                        onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
-                    }
+                // Spacer at the end
+                item {
+                    Spacer(Modifier.height(50.dp))
+                }
+            }
+
+            // Floating Surface button at the bottom
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)  // Position it at the bottom-right
+                    .padding(vertical = 10.dp, horizontal = 16.dp),  // Padding from edges
+                color = Color.Transparent
+            ) {
+                CreateRecipeButton {
+                    onCreateRecipeClick(recipeItems, recommendationViewModel, navController)
                 }
             }
         }

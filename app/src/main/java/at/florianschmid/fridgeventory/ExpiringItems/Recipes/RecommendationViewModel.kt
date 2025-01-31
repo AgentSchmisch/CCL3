@@ -46,6 +46,10 @@ class RecipeViewModel @Inject constructor(private val remoteService: RemoteServi
     val recipe = recipeService.recipe
     val recipeStep = recipeService.recipeStep
 
+    fun resetRecipeStep(){
+        recipeService.resetRecipeStep()
+    }
+
     fun fetchRecipe(recipeId: Int, recipeName: String, recipeImage: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {

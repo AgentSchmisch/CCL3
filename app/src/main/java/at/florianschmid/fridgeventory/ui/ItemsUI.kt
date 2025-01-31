@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -165,23 +167,30 @@ fun ItemsHomeScreen(
     val state by itemViewModel.itemUiState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Title at the top
-            Text(
-                "Fridgeventory",
-                style = Typography.titleLarge,
-                modifier = Modifier.padding(16.dp),
-                color = colorResource(R.color.f_dark_purple)
-            )
+        // LazyColumn is the only scrollable component now
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Header item at the top
+            item {
+                Text(
+                    "Fridgeventory",
+                    style = Typography.titleLarge,
+                    modifier = Modifier.padding(16.dp),
+                    color = colorResource(R.color.f_dark_purple)
+                )
+            }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(state.items) { _, item ->
-                    FridgeListItem(
-                        item, onEditClick = { onEditClick(item.id) }, viewModel = itemViewModel
-                    )
-                }
+            // List of items
+            itemsIndexed(state.items) { _, item ->
+                FridgeListItem(
+                    item, onEditClick = { onEditClick(item.id) }, viewModel = itemViewModel
+                )
+            }
+
+            // Additional space after the list
+            item {
+                Spacer(Modifier.height(50.dp))
             }
         }
 
@@ -189,6 +198,8 @@ fun ItemsHomeScreen(
         AddItemButton(onAddClick)
     }
 }
+
+
 
 
 @Composable
